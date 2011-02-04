@@ -43,6 +43,7 @@ public:
   uint32_t getMiliSecs() const;
   operator std::string() const;
   void getTimespec(struct timespec &timespec) const;
+  Chrono &operator += (const Chrono &);
 
 protected:
   struct timespec m_times[2];

@@ -31,10 +31,13 @@
 #include "chrono.hh"
 
 #include <iostream>
+
 class TestChrono : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestChrono);
   CPPUNIT_TEST(test_chrono);
+  CPPUNIT_TEST(test_addition);
+  CPPUNIT_TEST(test_print);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -47,6 +50,40 @@ public:
     c.stop();
     CPPUNIT_ASSERT(c.getMiliSecs() >= 1000);
   }
+
+  void test_addition() {
+    Chrono c1, c2;
+
+    c1.start();
+    c2.start();
+    usleep(30000); // 30 msecs
+    c1.stop();
+    c2.stop();
+
+    struct timespec tspec;
+    c1.getTimespec(tspec);
+    CPPUNIT_ASSERT_EQUAL((time_t) 0, tspec.tv_sec);
+
+    uint32_t nanos = tspec.tv_nsec;
+    c2.getTimespec(tspec);
+    CPPUNIT_ASSERT_EQUAL((time_t) 0, tspec.tv_sec);
+    nanos += tspec.tv_nsec;
+
+    c1 += c2;
+
+    c1.getTimespec(tspec);
+    CPPUNIT_ASSERT_EQUAL((uint32_t) tspec.tv_nsec, nanos);
+  }
+
+  void test_print() {
+    Chrono c;
+    c.start();
+    c.stop();
+
+    std::cout << c << std::endl;
+    std::cout << c.operator std::string() << std::endl;
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestChrono);
+

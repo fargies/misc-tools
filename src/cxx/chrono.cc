@@ -51,6 +51,18 @@ Chrono::operator std::string() const {
   return oss.str();
 }
 
+Chrono &Chrono::operator += (const Chrono &c) {
+  getTimespec(m_times[0]); // getTimespec must work on itself
+  c.getTimespec(m_times[1]);
+
+  uint32_t i = m_times[0].tv_nsec + m_times[1].tv_nsec;
+  m_times[1].tv_nsec = i % 1000000000;
+  m_times[1].tv_sec += m_times[0].tv_sec + ((i >= 1000000000) ? 1 : 0);
+
+  bzero(m_times, sizeof(struct timespec));
+  return *this;
+}
+
 std::ostream &operator << (std::ostream &os, const Chrono &chrono) {
   return os << chrono.operator std::string();
 }
