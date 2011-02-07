@@ -1,8 +1,9 @@
 
-add_executable(iterator_test iterator_test.cc)
-target_link_libraries(iterator_test testHelper)
+add_library(chrono chrono.cc chrono.hh)
+target_link_libraries(chrono rt)
 
-add_test(iterator_test ${CMAKE_BINARY_DIR}/src/cxx/iterator_test)
+add_library(fileLock fileLock.cc fileLock.hh)
+target_link_libraries(fileLock rt)
 
 add_subdirectory(sem)
 add_subdirectory(tests)
