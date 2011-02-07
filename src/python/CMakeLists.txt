@@ -7,3 +7,4 @@ set(iter_SRCS
 add_library(iter SHARED ${iter_SRCS})
 set_target_properties(iter PROPERTIES PREFIX "")
 
+add_subdirectory(tests)
