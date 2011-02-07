@@ -43,7 +43,7 @@ PyDictIterator<T>::PyDictIterator(PyObject *obj) :
 
 template <typename T>
 PyDictIterator<T>::PyDictIterator(const PyDictIterator< T > &it) :
-  m_dict(obj), m_pos(it.m_pos)
+  m_dict(it.m_dict), m_pos(it.m_pos)
 {
   Py_INCREF(m_dict);
 }
@@ -55,13 +55,13 @@ PyDictIterator<T>::~PyDictIterator()
 }
 
 template <typename T>
-PyDictIterator &PyDictIterator<T>::operator ++() {
+PyDictIterator<T> &PyDictIterator<T>::operator ++() {
   m_pos++;
   return *this;
 }
 
 template <typename T>
-PyDictIterator PyDictIterator<T>::operator ++(int) {
+PyDictIterator<T> PyDictIterator<T>::operator ++(int) {
   PyDictIterator it(*this);
   m_pos++;
   return it;
@@ -80,7 +80,7 @@ bool PyDictIterator<T>::operator !=(const PyDictIterator<T> &rhs)
 }
 
 template <>
-std::pair< std::string, std::string > &PyDictIterator::operator *()
+std::pair< std::string, std::string > &PyDictIterator<std::pair< std::string, std::string > >::operator *()
 {
   PyObject *key, *value;
   if (PyDict_Next(m_dict, &m_pos, &key, &value)) {
