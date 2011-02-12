@@ -24,7 +24,7 @@
 **
 */
 
-
+#include <Python.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
 
@@ -33,11 +33,22 @@
 class TestPyDict : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestPyDict);
-  CPPUNIT_TEST(test_simple);
+  CPPUNIT_TEST(test_PyDictValue);
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  void test_simple() {
+  void setUp() {
+    Py_Initialize();
+  }
+
+  void tearDown() {
+    Py_Finalize();
+  }
+
+  void test_PyDictValue() {
+    PyDictValue val;
+
+    val = 42;
   }
 };
 

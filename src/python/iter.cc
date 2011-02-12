@@ -20,7 +20,7 @@
 ** iter.cc
 **
 **        Created on: Wed 02 Feb 2011 11:12:14 PM CET
-** Last modification: Wed 02 Feb 2011 11:21:08 PM CET
+** Last modification: Thu 10 Feb 2011 01:03:40 AM CET
 **            Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
@@ -111,8 +111,50 @@ spam_myiter(PyObject *self, PyObject *args)
   return (PyObject *)p;
 }
 
+static PyObject *
+spam_tester(PyObject *self, PyObject *args)
+{
+  PyObject *obj, *iter, *item;
+
+  if (!PyArg_ParseTuple(args, "O:tester", &obj)) return NULL;
+
+  iter = PyObject_GetIter(obj);
+  if (!iter) {
+    printf("Not an iterable\n");
+    return NULL;
+  }
+
+printf("iter : %s\n", obj->ob_type->tp_name);
+  while (item = PyIter_Next(iter)) {
+    printf("item: %s\n", item->ob_type->tp_name);
+    Py_DECREF(item);
+  }
+  Py_DECREF(iter);
+
+  PyObject *items = PyDict_Items(obj);
+  iter = PyObject_GetIter(items);
+
+  while (item = PyIter_Next(iter)) {
+    printf("item: %s\n", item->ob_type->tp_name);
+    printf("refcnt: %i\n", item->ob_refcnt);
+
+    PyObject *item2 = PyTuple_GetItem(item, 1);
+    //PyTuple_SetItem(item, 1, PyString_FromString("pwet"));
+
+    Py_DECREF(item);
+  }
+  Py_DECREF(iter);
+
+
+  Py_DECREF(items);
+  Py_DECREF(obj); // is it required?
+
+  return NULL;
+}
+
 static PyMethodDef SpamMethods[] = {
     {"myiter",  spam_myiter, METH_VARARGS, "Iterate from i=0 while i<m."},
+    {"tester",  spam_tester, METH_VARARGS, "Test method."},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
