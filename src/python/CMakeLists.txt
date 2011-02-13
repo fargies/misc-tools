@@ -10,7 +10,7 @@ set_target_properties(iter PROPERTIES PREFIX "")
 
 set(PythonCpp_SRCS
         PyDict.cc PyDictValue.cc
-        PyDictIterator.cc)
+        PyDictIterator.cc PyValue.cc)
 add_library(python-c++ SHARED ${PythonCpp_SRCS})
 
 add_subdirectory(tests)

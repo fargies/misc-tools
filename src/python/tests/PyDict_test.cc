@@ -27,13 +27,14 @@
 #include <Python.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
+#include <iostream>
 
 #include "PyDict.hh"
 
 class TestPyDict : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestPyDict);
-  CPPUNIT_TEST(test_PyDictValue);
+  CPPUNIT_TEST(test_PyDict);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -47,8 +48,30 @@ public:
 
   void test_PyDictValue() {
     PyDictValue val;
-
+    val == "pwet"; "pwet" == val;
+val == std::string("pwet"); std::string("pwet") == val;
     val = 42;
+  }
+
+  void test_PyDict() {
+    PyObject *obj = PyRun_String("{ 'textKey' : \"textValue\", 1 : 2, 3 : 'textValue2' }", Py_eval_input, Py_None, Py_None);
+
+    CPPUNIT_ASSERT(obj != NULL);
+
+    PyDict dict(obj);
+
+    PyDict::iterator it = dict.begin();
+
+    CPPUNIT_ASSERT(it != dict.end());
+    CPPUNIT_ASSERT_EQUAL(std::string("textKey"), it->first);
+    CPPUNIT_ASSERT("textValue" == it->second);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("1"), (++it)->first);
+    CPPUNIT_ASSERT("2" == (it++)->second);
+    CPPUNIT_ASSERT("textValue2" == (it++)->second);
+    CPPUNIT_ASSERT(dict.end() == it);
+
+    Py_DECREF(obj);
   }
 };
 

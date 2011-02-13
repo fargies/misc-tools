@@ -90,31 +90,26 @@ PyDictValue::operator const char *() const
 {
   PyObject *obj = getValue();
   if (!obj)
-    throw bad_cast();
+    throw PyError("Can't cast empty PyDictValue");
   const char *ret = PyString_AsString(obj);
 
   if (PyErr_Occurred()) {
     PyErr_Clear();
-    throw bad_cast();
+    throw PyError("Can't cast in string");
   }
   return ret;
-}
-
-PyDictValue::operator std::string() const
-{
-  return this->operator const char *();
 }
 
 PyDictValue::operator int() const
 {
   PyObject *obj = getValue();
   if (!obj)
-    throw bad_cast();
+    throw PyError("Can't cast empty PyDictValue");
   long ret = PyInt_AsLong(obj);
 
   if (PyErr_Occurred()) {
     PyErr_Clear();
-    throw bad_cast();
+    throw PyError("Can't cast in int");
   }
 
   return (int) ret;
@@ -124,13 +119,28 @@ PyDictValue::operator unsigned int() const
 {
   PyObject *obj = getValue();
   if (!obj)
-    throw bad_cast();
+    throw PyError("Can't cast empty PyDictValue");
   long ret = PyInt_AsLong(obj);
 
   if (PyErr_Occurred()) {
     PyErr_Clear();
-    throw bad_cast();
+    throw PyError("Can't cast in int");
   }
 
   return (unsigned int) ret;
+}
+
+bool PyDictValue::operator == (const char *str) const
+{
+  try {
+    return ::strcmp(str, this->operator const char *()) == 0;
+  }
+  catch (PyError &e) {
+    return false;
+  }
+}
+
+bool PyDictValue::operator == (const std::string &str) const
+{
+  return this->operator == (str.c_str());
 }

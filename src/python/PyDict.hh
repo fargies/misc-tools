@@ -28,17 +28,11 @@
 #define PYDICT_HH_
 
 #include <map>
+#include <string>
 #include <iterator>
-#include <stdexcept>
 #include <Python.h>
 
-class PyError : public std::logic_error
-{
-public:
-  PyError(const std::string &what) :
-    std::logic_error(what)
-  {}
-};
+#include "PyError.hh"
 
 class PyDictValue
 {
@@ -53,9 +47,11 @@ public:
   PyDictValue &operator = (unsigned int);
 
   operator const char * () const;
-  operator std::string() const;
   operator int() const;
   operator unsigned int() const;
+
+  bool operator == (const char *str) const;
+  bool operator == (const std::string &str) const;
 
   void set(PyObject *dict, PyObject *key, PyObject *value);
   inline void clear() {
@@ -88,6 +84,18 @@ protected:
   }
 };
 
+/**
+ * @details Comparison template used to revert parameters
+ * on char * and string comparison
+ * @param t the templated item to compare
+ * @param val a PyDictValue item
+ * @return true when items are equal
+ */
+template <typename T>
+bool operator == (T t, const PyDictValue &val) {
+  return val.operator == (t);
+}
+
 class PyDictIterator :
   public std::iterator<std::input_iterator_tag, std::pair<std::string, PyDictValue > >
 {
@@ -104,8 +112,8 @@ public:
   ~PyDictIterator();
   PyDictIterator& operator ++();
   PyDictIterator operator ++(int);
-  bool operator ==(const PyDictIterator &rhs);
-  bool operator !=(const PyDictIterator &rhs);
+  bool operator ==(const PyDictIterator &rhs) const;
+  bool operator !=(const PyDictIterator &rhs) const;
 
   reference operator *();
   pointer operator ->();

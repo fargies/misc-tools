@@ -28,6 +28,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <iostream>
 #include "PyDict.hh"
 
 PyDictIterator::PyDictIterator(PyObject *obj) :
@@ -36,8 +37,9 @@ PyDictIterator::PyDictIterator(PyObject *obj) :
   if (m_dict) {
     m_pos = 0;
     if (!PyDict_Check(obj))
-      throw std::invalid_argument("Not a PyDict");
+      throw PyError("Not a PyDict");
     Py_INCREF(m_dict);
+    getNext();
   }
   else {
     m_pos = -1;
@@ -66,12 +68,12 @@ PyDictIterator PyDictIterator::operator ++(int) {
   return it;
 }
 
-bool PyDictIterator::operator ==(const PyDictIterator &rhs)
+bool PyDictIterator::operator ==(const PyDictIterator &rhs) const
 {
   return (m_dict == rhs.m_dict) && (m_pos == rhs.m_pos);
 }
 
-bool PyDictIterator::operator !=(const PyDictIterator &rhs)
+bool PyDictIterator::operator !=(const PyDictIterator &rhs) const
 {
   return (m_dict != rhs.m_dict) || (m_pos != rhs.m_pos);
 }
@@ -94,6 +96,7 @@ void PyDictIterator::getNext()
     clear();
   }
   else {
+    std::cout << key->ob_type->tp_name << std::endl;
     m_value.first = PyString_AsString(key);
     m_value.second.set(m_dict, key, value);
   }
