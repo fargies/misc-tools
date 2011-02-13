@@ -49,7 +49,7 @@ public:
   }
 
   void test_value() {
-    PyValue val, val2;
+    PyValue val, val2(Py_None);
 
     CPPUNIT_ASSERT(val == val2);
     CPPUNIT_ASSERT(val == Py_None);

@@ -28,8 +28,11 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
 #include <iostream>
+#include <string>
 
 #include "PyDict.hh"
+
+using namespace std;
 
 class TestPyDict : public CppUnit::TestFixture
 {
@@ -63,10 +66,10 @@ val == std::string("pwet"); std::string("pwet") == val;
     PyDict::iterator it = dict.begin();
 
     CPPUNIT_ASSERT(it != dict.end());
-    CPPUNIT_ASSERT_EQUAL(std::string("textKey"), it->first);
+    CPPUNIT_ASSERT_EQUAL(string("textKey"), (string) it->first);
     CPPUNIT_ASSERT("textValue" == it->second);
 
-    CPPUNIT_ASSERT_EQUAL(std::string("1"), (++it)->first);
+    CPPUNIT_ASSERT_EQUAL(string("1"), (string) (++it)->first);
     CPPUNIT_ASSERT("2" == (it++)->second);
     CPPUNIT_ASSERT("textValue2" == (it++)->second);
     CPPUNIT_ASSERT(dict.end() == it);

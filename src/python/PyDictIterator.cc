@@ -97,8 +97,8 @@ void PyDictIterator::getNext()
   }
   else {
     std::cout << key->ob_type->tp_name << std::endl;
-    m_value.first = PyString_AsString(key);
-    m_value.second.set(m_dict, key, value);
+    m_value.first = key;
+    m_value.second = PyDictValue(m_dict, key);
   }
 }
 
@@ -106,8 +106,8 @@ void PyDictIterator::clear()
 {
   //FIXME m_value still contains something
   m_pos = -1;
-  m_value.first.clear();
-  m_value.second.clear();
+ // m_value.first.clear();
+ // m_value.second.clear();
 }
 
 PyDict::PyDict(PyObject *obj) throw (std::invalid_argument):

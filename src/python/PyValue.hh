@@ -50,7 +50,7 @@ public:
 
   PyValue(const PyValue &);
 
-  ~PyValue();
+  virtual ~PyValue();
 
   PyValue &operator = (const char *);
   PyValue &operator = (const std::string &);
@@ -88,15 +88,15 @@ public:
    */
   inline const char *type() const
   {
-    return m_obj->ob_type->tp_name;
+    return m_value->ob_type->tp_name;
   }
 
   /**
    * @brief return internal PyObject
    */
-  inline PyObject &object() const
+  inline PyObject *object() const
   {
-    return *m_obj;
+    return m_value;
   }
 
   /**
@@ -106,7 +106,7 @@ public:
   const char *c_str() const throw (PyError);
 
 protected:
-  PyObject *m_obj;
+  PyObject *m_value;
 };
 
 

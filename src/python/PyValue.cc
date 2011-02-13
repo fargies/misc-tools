@@ -27,69 +27,69 @@
 #include "PyValue.hh""
 
 PyValue::PyValue() :
-  m_obj(Py_None)
+  m_value(Py_None)
 {
-  Py_INCREF(m_obj);
+  Py_INCREF(m_value);
 }
 
 PyValue::PyValue(PyObject *obj) :
-  m_obj(obj)
+  m_value(obj)
 {
-  Py_INCREF(m_obj);
+  Py_INCREF(m_value);
 }
 
 PyValue::PyValue(const PyValue &val) :
-  m_obj(val.m_obj)
+  m_value(val.m_value)
 {
-  Py_INCREF(m_obj);
+  Py_INCREF(m_value);
 }
 
 PyValue::~PyValue()
 {
-  Py_DECREF(m_obj);
+  Py_DECREF(m_value);
 }
 
 PyValue &PyValue::operator = (const char *str)
 {
-  Py_XDECREF(m_obj);
-  m_obj = PyString_FromString(str);
+  Py_XDECREF(m_value);
+  m_value = PyString_FromString(str);
   return *this;
 }
 
 PyValue &PyValue::operator = (const std::string &str)
 {
-  Py_XDECREF(m_obj);
-  m_obj = PyString_FromString(str.c_str());
+  Py_XDECREF(m_value);
+  m_value = PyString_FromString(str.c_str());
   return *this;
 }
 
 PyValue &PyValue::operator = (int i)
 {
-  Py_XDECREF(m_obj);
-  m_obj = PyInt_FromLong(i);
+  Py_XDECREF(m_value);
+  m_value = PyInt_FromLong(i);
   return *this;
 }
 
 PyValue &PyValue::operator = (unsigned int i)
 {
-  Py_XDECREF(m_obj);
-  m_obj = PyInt_FromLong(i);
+  Py_XDECREF(m_value);
+  m_value = PyInt_FromLong(i);
   return *this;
 }
 
 PyValue &PyValue::operator = (PyObject *obj)
 {
   Py_XINCREF(obj);
-  Py_XDECREF(m_obj);
-  m_obj = obj;
+  Py_XDECREF(m_value);
+  m_value = obj;
   return *this;
 }
 
 PyValue &PyValue::operator = (const PyValue &val)
 {
-  Py_INCREF(val.m_obj);
-  Py_DECREF(m_obj);
-  m_obj = val.m_obj;
+  Py_INCREF(val.m_value);
+  Py_DECREF(m_value);
+  m_value = val.m_value;
   return *this;
 }
 
@@ -100,7 +100,7 @@ PyValue::operator std::string () const
 
 PyValue::operator int() const
 {
-  long ret = PyInt_AsLong(m_obj);
+  long ret = PyInt_AsLong(m_value);
   if (PyErr_Occurred()) {
     PyErr_Clear();
     throw PyError("Can't cast PyValue as int");
@@ -110,7 +110,7 @@ PyValue::operator int() const
 
 PyValue::operator unsigned int() const
 {
-  long ret = PyInt_AsLong(m_obj);
+  long ret = PyInt_AsLong(m_value);
   if (PyErr_Occurred()) {
     PyErr_Clear();
     throw PyError("Can't cast PyValue as unsigned int");
@@ -135,17 +135,17 @@ bool PyValue::operator == (const std::string &str) const
 
 bool PyValue::operator == (const PyValue &val) const
 {
-  return PyObject_RichCompareBool(val.m_obj, this->m_obj, Py_EQ) == 1;
+  return PyObject_RichCompareBool(val.m_value, this->m_value, Py_EQ) == 1;
 }
 
 bool PyValue::operator == (PyObject *obj) const
 {
-  return PyObject_RichCompareBool(obj, this->m_obj, Py_EQ) == 1;
+  return PyObject_RichCompareBool(obj, this->m_value, Py_EQ) == 1;
 }
 
 const char *PyValue::c_str() const throw (PyError)
 {
-  const char *ret = PyString_AsString(m_obj);
+  const char *ret = PyString_AsString(m_value);
 
   if (PyErr_Occurred()) {
     PyErr_Clear();

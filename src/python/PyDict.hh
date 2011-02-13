@@ -33,74 +33,36 @@
 #include <Python.h>
 
 #include "PyError.hh"
+#include "PyValue.hh"
 
-class PyDictValue
+/**
+ * @brief a dict value
+ * @details modifying this value directly modifies the dict's value
+ */
+class PyDictValue : public PyValue
 {
 public:
   PyDictValue(PyObject *dict, PyObject *key, PyObject *value = NULL);
+  PyDictValue(const PyDictValue &);
   PyDictValue();
-  ~PyDictValue();
+  virtual ~PyDictValue();
 
   PyDictValue &operator = (const char *);
   PyDictValue &operator = (const std::string &);
   PyDictValue &operator = (int);
   PyDictValue &operator = (unsigned int);
-
-  operator const char * () const;
-  operator int() const;
-  operator unsigned int() const;
-
-  bool operator == (const char *str) const;
-  bool operator == (const std::string &str) const;
-
-  void set(PyObject *dict, PyObject *key, PyObject *value);
-  inline void clear() {
-    set(NULL, NULL, NULL);
-  }
+  PyDictValue &operator = (PyObject *);
+  PyDictValue &operator = (const PyValue &);
 
 protected:
-  mutable PyObject *m_dict, *m_key, *m_value;
-
-  inline bool setValue(PyObject *obj) throw (PyError) {
-    if (m_dict && m_key && obj) {
-      PyDict_SetItem(m_dict, m_key, obj);
-
-      if (m_value)
-        Py_DECREF(m_value);
-      m_value = obj;
-    }
-    else {
-      Py_XDECREF(obj);
-      throw PyError("Can't set PyDictValue on NULL dict");
-    }
-  }
-
-  inline PyObject *getValue() const {
-    if (!m_value && m_dict && m_key) {
-      m_value = PyDict_GetItem(m_dict, m_key);
-      Py_XINCREF(m_value);
-    }
-    return m_value;
-  }
+  mutable PyObject *m_dict, *m_key;
 };
 
-/**
- * @details Comparison template used to revert parameters
- * on char * and string comparison
- * @param t the templated item to compare
- * @param val a PyDictValue item
- * @return true when items are equal
- */
-template <typename T>
-bool operator == (T t, const PyDictValue &val) {
-  return val.operator == (t);
-}
-
 class PyDictIterator :
-  public std::iterator<std::input_iterator_tag, std::pair<std::string, PyDictValue > >
+  public std::iterator<std::input_iterator_tag, std::pair<PyValue, PyDictValue > >
 {
 public:
-  typedef std::pair<std::string, PyDictValue> value_type;
+  typedef std::pair<PyValue, PyDictValue> value_type;
   typedef value_type & reference;
   typedef value_type * pointer;
 
@@ -144,7 +106,7 @@ public:
   /**
    * @brief key_type defaults to string
    */
-  typedef std::string key_type;
+  typedef PyValue key_type;
   typedef PyDictValue mapped_type;
   typedef std::pair<const key_type, mapped_type> value_type;
   typedef PyDictIterator iterator;

@@ -137,6 +137,6 @@ void PyDict::clear() {
   PyDict_Clear(m_dict);
 }
 
-PyDict::iterator PyDict::find(const std::string &key)
+/*PyDict::iterator PyDict::find(const std::string &key)
 {
-}
+}*/

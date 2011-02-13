@@ -30,117 +30,69 @@
 using namespace std;
 
 PyDictValue::PyDictValue(PyObject *dict, PyObject *key, PyObject *value) :
-  m_dict(dict), m_key(key), m_value(value)
+  PyValue((value == NULL) ? PyDict_GetItem(dict, key) : value),
+  m_dict(dict), m_key(key)
 {
   Py_INCREF(dict);
   Py_INCREF(key);
-  Py_XINCREF(value);
+}
+
+PyDictValue::PyDictValue(const PyDictValue &value) :
+  PyValue(value), m_dict(value.m_dict), m_key(value.m_key)
+{
+  Py_INCREF(m_dict);
+  Py_INCREF(m_key);
 }
 
 PyDictValue::PyDictValue() :
-  m_dict(NULL), m_key(NULL), m_value(NULL)
+  PyValue(), m_dict(NULL), m_key(NULL)
 {
 }
 
 PyDictValue::~PyDictValue()
 {
-  Py_XDECREF(m_value);
   Py_XDECREF(m_dict);
   Py_XDECREF(m_key);
-}
-
-void PyDictValue::set(PyObject *dict, PyObject *key, PyObject *value)
-{
-  Py_XDECREF(m_value);
-  Py_XDECREF(m_dict);
-  Py_XDECREF(m_key);
-
-  m_dict = dict;
-  m_key = key;
-  m_value = value;
-  Py_XINCREF(m_dict);
-  Py_XINCREF(m_key);
-  Py_XINCREF(m_value);
 }
 
 PyDictValue &PyDictValue::operator = (const char *value)
 {
-  setValue(PyString_FromString(value));
+  PyDict_SetItem(m_dict, m_key,
+      PyValue::operator = (value).object());
   return *this;
 }
 
 PyDictValue &PyDictValue::operator = (const std::string &value)
 {
-  return this->operator = (value.c_str());
+  PyDict_SetItem(m_dict, m_key,
+      PyValue::operator = (value).object());
+  return *this;
 }
 
 PyDictValue &PyDictValue::operator = (int value)
 {
- setValue(PyInt_FromLong(value));
- return *this;
+  PyDict_SetItem(m_dict, m_key,
+      PyValue::operator = (value).object());
+  return *this;
 }
 
 PyDictValue &PyDictValue::operator = (unsigned int value)
 {
- setValue(PyInt_FromLong(value));
- return *this;
+  PyDict_SetItem(m_dict, m_key,
+      PyValue::operator = (value).object());
+  return *this;
 }
 
-PyDictValue::operator const char *() const
+PyDictValue &PyDictValue::operator = (PyObject *value)
 {
-  PyObject *obj = getValue();
-  if (!obj)
-    throw PyError("Can't cast empty PyDictValue");
-  const char *ret = PyString_AsString(obj);
-
-  if (PyErr_Occurred()) {
-    PyErr_Clear();
-    throw PyError("Can't cast in string");
-  }
-  return ret;
+  PyDict_SetItem(m_dict, m_key,
+      PyValue::operator = (value).object());
+  return *this;
 }
 
-PyDictValue::operator int() const
+PyDictValue &PyDictValue::operator = (const PyValue &value)
 {
-  PyObject *obj = getValue();
-  if (!obj)
-    throw PyError("Can't cast empty PyDictValue");
-  long ret = PyInt_AsLong(obj);
-
-  if (PyErr_Occurred()) {
-    PyErr_Clear();
-    throw PyError("Can't cast in int");
-  }
-
-  return (int) ret;
-}
-
-PyDictValue::operator unsigned int() const
-{
-  PyObject *obj = getValue();
-  if (!obj)
-    throw PyError("Can't cast empty PyDictValue");
-  long ret = PyInt_AsLong(obj);
-
-  if (PyErr_Occurred()) {
-    PyErr_Clear();
-    throw PyError("Can't cast in int");
-  }
-
-  return (unsigned int) ret;
-}
-
-bool PyDictValue::operator == (const char *str) const
-{
-  try {
-    return ::strcmp(str, this->operator const char *()) == 0;
-  }
-  catch (PyError &e) {
-    return false;
-  }
-}
-
-bool PyDictValue::operator == (const std::string &str) const
-{
-  return this->operator == (str.c_str());
+  PyDict_SetItem(m_dict, m_key,
+      PyValue::operator = (value).object());
+  return *this;
 }
