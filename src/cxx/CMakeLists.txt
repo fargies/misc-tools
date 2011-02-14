@@ -8,4 +8,4 @@ target_link_libraries(fileLock rt)
 add_subdirectory(sem)
 add_subdirectory(tests)
 add_subdirectory(bench)
-
+add_subdirectory(variant)

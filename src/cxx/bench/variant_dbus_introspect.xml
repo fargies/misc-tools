@@ -1,0 +1,17 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="variant.dbus.bench">
+    <method name="test_ass">
+      <arg name="mapin" type="a{ss}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+    <method name="test_v">
+      <arg name="mapin" type="v" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+    <method name="test_asv">
+      <arg name="mapin" type="a{sv}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+  </interface>
+</node>
