@@ -26,12 +26,16 @@
 
 #include <iomanip>
 #include <sstream>
-#include <strings.h>
+#include <string.h>
 
 #include "chrono.hh"
 
 Chrono::Chrono() {
-  bzero(m_times, sizeof (struct timespec) * 2);
+  clear();
+}
+
+void Chrono::clear() {
+  memset(m_times, 0, sizeof (struct timespec) * 2);
 }
 
 uint32_t Chrono::getMiliSecs() const {
@@ -59,7 +63,7 @@ Chrono &Chrono::operator += (const Chrono &c) {
   m_times[1].tv_nsec = i % 1000000000;
   m_times[1].tv_sec += m_times[0].tv_sec + ((i >= 1000000000) ? 1 : 0);
 
-  bzero(m_times, sizeof(struct timespec));
+  memset(m_times, 0, sizeof(struct timespec));
   return *this;
 }
 

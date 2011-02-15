@@ -37,6 +37,7 @@ class Chrono
 public:
   Chrono();
 
+  void clear();
   inline void start() { clock_gettime(CLOCK_MONOTONIC, &m_times[0]); }
   inline void stop() { clock_gettime(CLOCK_MONOTONIC, &m_times[1]); }
 

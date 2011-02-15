@@ -49,6 +49,9 @@ public:
     sleep(1);
     c.stop();
     CPPUNIT_ASSERT(c.getMiliSecs() >= 1000);
+
+    c.clear();
+    CPPUNIT_ASSERT(c.getMiliSecs() == 0);
   }
 
   void test_addition() {
