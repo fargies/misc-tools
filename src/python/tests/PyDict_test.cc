@@ -54,20 +54,23 @@ public:
 
     CPPUNIT_ASSERT(obj != NULL);
 
-    PyDict dict(obj);
+    { /* this bracket is required to assert on refcount */
+      PyDict dict(obj);
 
-    PyDict::iterator it = dict.begin();
+      PyDict::iterator it = dict.begin();
 
-    CPPUNIT_ASSERT(it != dict.end());
-    CPPUNIT_ASSERT_EQUAL(string("1"), (string) it->first);
-    CPPUNIT_ASSERT("2" != it->second);
-    CPPUNIT_ASSERT(2 == it->second);
+      CPPUNIT_ASSERT(it != dict.end());
+      CPPUNIT_ASSERT_EQUAL(string("1"), (string) it->first);
+      CPPUNIT_ASSERT("2" != it->second);
+      CPPUNIT_ASSERT(2 == it->second);
 
-    CPPUNIT_ASSERT_EQUAL(string("3"), (string) (++it)->first);
-    CPPUNIT_ASSERT("textValue2" == (it++)->second);
-    CPPUNIT_ASSERT("textValue" == (it++)->second);
-    CPPUNIT_ASSERT(dict.end() == it);
+      CPPUNIT_ASSERT_EQUAL(string("3"), (string) (++it)->first);
+      CPPUNIT_ASSERT("textValue2" == (it++)->second);
+      CPPUNIT_ASSERT("textValue" == (it++)->second);
+      CPPUNIT_ASSERT(dict.end() == it);
+    }
 
+    CPPUNIT_ASSERT_EQUAL((Py_ssize_t) 1, obj->ob_refcnt);
     Py_DECREF(obj);
   }
 };
