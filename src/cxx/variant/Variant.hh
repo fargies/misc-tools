@@ -108,13 +108,13 @@ class Variant
 
         //! @name string conversions
         //@{
-        operator std::string () const;
+        operator std::string &() const;
         //@}
 
         //! @name complex types conversions
         //@{
         operator std::map< std::string, Variant > &() const;
-        operator std::vector< Variant > () const;
+        operator std::vector< Variant > &() const;
         //! @brief uses #VARIANT_VECTOR Variant #Type (any 2 sized vector can be cast as a pair)
         operator std::pair< Variant, Variant > () const;
         //@}
@@ -134,12 +134,12 @@ class Variant
 
 #include <dbus-c++/dbus.h>
 
+namespace DBus {
+template <> struct type< ::Variant>        { static std::string sig(){ return "v";  } };
+}
+
 DBus::MessageIter &operator << (DBus::MessageIter &iter, const Variant &val);
 DBus::MessageIter &operator >> (DBus::MessageIter &iter, Variant &val);
-
-Variant& operator << (Variant &, const DBus::Variant &);
-
-const Variant& operator >> (const Variant &, DBus::Variant &);
 
 #endif
 

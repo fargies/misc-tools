@@ -26,6 +26,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <iostream>
 
 #include "Variant.hh"
 
@@ -105,7 +106,10 @@ Variant::Variant(const Variant &v)
     : m_type(VARIANT_NONE)
 {
     /* use the operator = */
-    this->operator=(v);
+    if (v.m_type != VARIANT_NONE)
+        this->operator=(v);
+    else
+        m_data = NULL;
 }
 
 void Variant::delData()
@@ -292,7 +296,7 @@ Variant::operator int64_t() const
     return *(int64_t *) m_data;
 }
 
-Variant::operator std::string () const
+Variant::operator std::string &() const
 {
     assert(m_type == VARIANT_STRING);
     return *((std::string *) m_data);
@@ -304,7 +308,7 @@ Variant::operator std::map<std::string, Variant> &() const
     return *(std::map<std::string, Variant> *) m_data;
 }
 
-Variant::operator std::vector<Variant> () const
+Variant::operator std::vector<Variant> &() const
 {
     assert(m_type == VARIANT_VECTOR);
     return *(std::vector<Variant> *) m_data;
@@ -322,123 +326,8 @@ Variant::operator std::pair<Variant, Variant> () const
 
 #ifdef DBUS_CPP_FOUND
 
-const Variant& operator >> (const Variant &var, ::DBus::Variant &d_var)
+static inline void DBusMessageIterToVariant(::DBus::MessageIter &iter, Variant &var)
 {
-    DBus::MessageIter d_it = d_var.writer();
-
-    switch (var.type()) {
-        case Variant::VARIANT_BOOL:
-            d_it << (bool) var;
-            break;;
-
-        case Variant::VARIANT_UINT16:
-            d_it << (uint16_t) var;
-            break;;
-
-        case Variant::VARIANT_INT16:
-            d_it << (int16_t) var;
-            break;;
-
-        case Variant::VARIANT_UINT32:
-            d_it << (uint32_t) var;
-            break;;
-
-        case Variant::VARIANT_INT32:
-            d_it << (int32_t) var;
-            break;;
-
-        case Variant::VARIANT_UINT64:
-            d_it << (uint64_t) var;
-            break;;
-
-        case Variant::VARIANT_INT64:
-            d_it << (int64_t) var;
-            break;;
-
-        case Variant::VARIANT_STRING:
-            d_it << (std::string) var;
-            break;;
-
-        case Variant::VARIANT_VECTOR:
-        {
-            std::vector<Variant> vect = var; // FIXME why a copy ?
-            std::vector<Variant>::const_iterator vit;
-
-            DBus::MessageIter d_vit = d_it.new_array(DBus::type<DBus::Variant>::sig().c_str());
-            for (vit = vect.begin(); vit != vect.end(); ++vit) {
-                ::DBus::Variant v;
-                (*vit) >> v;
-                d_vit << v;
-            }
-            d_it.close_container(d_vit);
-            break;;
-        }
-
-        case Variant::VARIANT_MAP:
-        {
-            std::map<std::string, Variant> map = var; // FIXME why a copy ?
-            std::map<std::string, Variant>::const_iterator mit;
-
-            DBus::MessageIter d_mit = d_it.new_array(("{" +
-                                                     DBus::type<std::string>::sig() +
-                                                     DBus::type<DBus::Variant>::sig() +
-                                                     "}").c_str());
-            for (mit = map.begin(); mit != map.end(); ++mit) {
-                ::DBus::Variant v;
-                ::DBus::MessageIter d_mit_entry = d_mit.new_dict_entry();
-
-                mit->second >> v;
-
-                d_mit_entry << mit->first << v;
-
-                d_mit.close_container(d_mit_entry);
-            }
-            d_it.close_container(d_mit);
-            break;;
-        }
-
-        case Variant::VARIANT_NONE:
-            break;;
-    };
-    return var;
-}
-
-static void DBusMessageIterToVariant(::DBus::MessageIter &iter, Variant &var)
-{
-    if (iter.is_dict()) {
-        std::map<std::string, Variant> map;
-
-        for (iter = iter.recurse(); !iter.at_end(); ++iter) {
-            DBus::MessageIter eit = iter.recurse();
-            std::string s;
-            Variant v;
-
-            try {
-                eit >> s;
-            } catch (DBus::Error dbErr) {
-                assert(0 && "Only std::string maps are supported with Variant");
-                return;
-            }
-
-            DBusMessageIterToVariant(eit, v);
-            map[s] = v;
-        }
-        var = map;
-    }
-    else if (iter.is_array()) {
-        std::vector<Variant> vect;
-
-        iter = iter.recurse();
-        while (!iter.at_end()) {
-            Variant v;
-
-            DBusMessageIterToVariant(iter, v);
-            vect.push_back(v);
-        }
-        var = vect;
-    }
-    else
-    {
 
 #define TO_DBUS(src,dest,type) \
     do { \
@@ -447,58 +336,88 @@ static void DBusMessageIterToVariant(::DBus::MessageIter &iter, Variant &var)
         dest = i; \
     } while (0);
 
-        switch (iter.type()) {
-            case 'b':
-                TO_DBUS(iter,var, bool);
-                break;
-            case 'q':
-                TO_DBUS(iter,var, uint16_t);
-                break;
-            case 'n':
-                TO_DBUS(iter,var, int16_t);
-                break;
-            case 'i':
-                TO_DBUS(iter,var,int32_t);
-                break;;
-            case 'u':
-                TO_DBUS(iter,var,uint32_t);
-                break;;
-            case 'x':
-                TO_DBUS(iter,var,int64_t);
-                break;;
-            case 't':
-                TO_DBUS(iter,var,uint64_t);
-                break;;
-            case 's':
-            {
-                std::string s;
-                iter >> s;
-                var = s;
-                break;;
-            }
-            case 'v':
-            {
-                DBus::MessageIter viter = iter.recurse();
-                DBusMessageIterToVariant(viter, var);
-                iter++;
-                break;;
-            }
-            default:
-                std::cerr << "Unhandled DBus::Variant type '" << iter.type() << "'" << std::endl ;
-                iter++;
-                break;;
+    switch (iter.type()) {
+        case 'b':
+            TO_DBUS(iter,var, bool);
+            break;
+        case 'q':
+            TO_DBUS(iter,var, uint16_t);
+            break;
+        case 'n':
+            TO_DBUS(iter,var, int16_t);
+            break;
+        case 'i':
+            TO_DBUS(iter,var,int32_t);
+            break;;
+        case 'u':
+            TO_DBUS(iter,var,uint32_t);
+            break;;
+        case 'x':
+            TO_DBUS(iter,var,int64_t);
+            break;;
+        case 't':
+            TO_DBUS(iter,var,uint64_t);
+            break;;
+        case 's':
+        {
+            //std::string s;
+            //iter >> s;
+            //var = s;
+            var = iter.get_string();
+            iter++;
+            break;;
         }
-    }
-}
+        case 'v':
+        {
+            DBus::MessageIter viter = iter.recurse();
+            DBusMessageIterToVariant(viter, var);
+            iter++;
+            break;;
+        }
+        case 'a':
+        {
+            if (iter.array_type() == 'e') { // map type
+                //TODO this might be enhanced
+                std::map<std::string, Variant> map;
 
-namespace DBus {
-template <> struct type< ::Variant>        { static std::string sig(){ return "v";  } };
-}
-Variant& operator << (Variant &var, const ::DBus::Variant &d_var)
-{
-    DBus::MessageIter m = d_var.reader();
-    DBusMessageIterToVariant(m, var);
-    return var;
+                for (iter = iter.recurse(); !iter.at_end(); ++iter) {
+                    DBus::MessageIter eit = iter.recurse();
+                    std::string s;
+                    Variant v;
+
+                    try {
+                        eit >> s;
+                    } catch (DBus::Error dbErr) {
+                        assert(0 && "Only std::string maps are supported with Variant");
+                        return;
+                    }
+
+                    DBusMessageIterToVariant(eit, v);
+                    map[s] = v;
+                }
+                var = map;
+            }
+            else { // array type
+                //TODO this might be enhanced
+                std::vector<Variant> vect;
+
+                iter = iter.recurse();
+                while (!iter.at_end()) {
+                    Variant v;
+
+                    DBusMessageIterToVariant(iter, v);
+                    vect.push_back(v);
+                }
+                var = vect;
+            }
+            break;;
+        }
+
+        default:
+            std::cerr << "Unhandled DBus::Variant type '" << iter.type() << "'" << std::endl ;
+            iter++;
+            break;;
+    }
 }
 
 DBus::MessageIter &operator << (DBus::MessageIter &iter, const Variant &var)
@@ -543,22 +462,13 @@ DBus::MessageIter &operator << (DBus::MessageIter &iter, const Variant &var)
 
         case Variant::VARIANT_STRING:
             d_it = iter.new_variant(DBus::type<std::string>::sig().c_str());
-            d_it << (std::string) var;
+            d_it << var.operator std::string&();
             break;;
 
         case Variant::VARIANT_VECTOR:
         {
             d_it = iter.new_variant(DBus::type<std::vector<DBus::Variant> >::sig().c_str());
-            std::vector<Variant> vect = var;
-            std::vector<Variant>::const_iterator vit;
-
-            DBus::MessageIter d_vit = d_it.new_array(DBus::type<DBus::Variant>::sig().c_str());
-            for (vit = vect.begin(); vit != vect.end(); ++vit) {
-                ::DBus::Variant v;
-                (*vit) >> v;
-                d_vit << v;
-            }
-            d_it.close_container(d_vit);
+            d_it << var.operator std::vector<Variant>&();
             break;;
         }
 

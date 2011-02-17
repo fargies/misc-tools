@@ -1,17 +1,71 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
   <interface name="variant.dbus.bench">
-    <method name="test_ass">
+  <!-- first test random string data -->
+    <method name="test1_mss">
       <arg name="mapin" type="a{ss}" direction="in" />
       <arg name="result" type="i" direction="out" />
     </method>
-    <method name="test_v">
-      <arg name="mapin" type="v" direction="in" />
+    <method name="test1_msas">
+      <arg name="mapin" type="a{sas}" direction="in" />
       <arg name="result" type="i" direction="out" />
     </method>
-    <method name="test_asv">
+    <method name="test1_msv">
       <arg name="mapin" type="a{sv}" direction="in" />
       <arg name="result" type="i" direction="out" />
     </method>
+    <method name="test1_mis">
+      <arg name="mapin" type="a{is}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+    <method name="test1_miv">
+      <arg name="mapin" type="a{iv}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+
+  <!-- second test copy and read int data -->
+    <method name="test2_mss">
+      <arg name="mapin" type="a{ss}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+    <method name="test2_msas">
+      <arg name="mapin" type="a{sas}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+    <method name="test2_msv">
+      <arg name="mapin" type="a{sv}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+    <method name="test2_mis">
+      <arg name="mapin" type="a{is}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+    <method name="test2_miv">
+      <arg name="mapin" type="a{iv}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+
+  <!-- third test copy and read multi-valued data -->
+    <method name="test3_mss">
+      <arg name="mapin" type="a{ss}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+    <method name="test3_msas">
+      <arg name="mapin" type="a{sas}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+    <method name="test3_msv">
+      <arg name="mapin" type="a{sv}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+    <method name="test3_mis">
+      <arg name="mapin" type="a{is}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+    <method name="test3_miv">
+      <arg name="mapin" type="a{iv}" direction="in" />
+      <arg name="result" type="i" direction="out" />
+    </method>
+
   </interface>
 </node>
