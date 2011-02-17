@@ -24,7 +24,8 @@
 **
 */
 
-#include "PyValue.hh""
+#include "PyValue.hh"
+#include <iostream>
 
 PyValue::PyValue() :
   m_value(Py_None)
@@ -42,6 +43,16 @@ PyValue::PyValue(const PyValue &val) :
   m_value(val.m_value)
 {
   Py_INCREF(m_value);
+}
+
+PyValue &PyValue::operator = (const PyValue &val)
+{
+  if (this != &val) {
+    Py_INCREF(val.m_value);
+    Py_DECREF(m_value);
+    m_value = val.m_value;
+  }
+  return *this;
 }
 
 PyValue::~PyValue()
@@ -85,17 +96,17 @@ PyValue &PyValue::operator = (PyObject *obj)
   return *this;
 }
 
-PyValue &PyValue::operator = (const PyValue &val)
-{
-  Py_INCREF(val.m_value);
-  Py_DECREF(m_value);
-  m_value = val.m_value;
-  return *this;
-}
-
 PyValue::operator std::string () const
 {
-  return this->c_str();
+  if (PyString_Check(m_value)) {
+    return this->c_str();
+  }
+  else {
+    PyObject *str = PyObject_Str(m_value);
+    std::string ret = PyString_AsString(str);
+    Py_DECREF(str);
+    return ret;
+  }
 }
 
 PyValue::operator int() const

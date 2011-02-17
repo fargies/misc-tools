@@ -44,6 +44,7 @@ class PyDictValue : public PyValue
 public:
   PyDictValue(PyObject *dict, PyObject *key, PyObject *value = NULL);
   PyDictValue(const PyDictValue &);
+  PyDictValue &operator = (const PyDictValue &);
   PyDictValue();
   virtual ~PyDictValue();
 
@@ -71,6 +72,7 @@ public:
    */
   PyDictIterator(PyObject *obj = NULL);
   PyDictIterator(const PyDictIterator &);
+  PyDictIterator &operator = (const PyDictIterator &);
   ~PyDictIterator();
   PyDictIterator& operator ++();
   PyDictIterator operator ++(int);

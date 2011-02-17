@@ -40,12 +40,20 @@ PyDict::~PyDict()
 PyDict &PyDict::operator =(const PyDict &dict)
 {
   if (this != &dict) {
+    Py_INCREF(dict.m_dict);
     if (m_dict)
       Py_DECREF(m_dict);
     m_dict = dict.m_dict;
-    Py_INCREF(m_dict);
   }
   return *this;
+}
+
+PyDict::PyDict(PyObject *obj) throw (std::invalid_argument):
+  m_dict(obj)
+{
+  if (!PyDict_Check(obj))
+    throw std::invalid_argument("Not a PyDict");
+  Py_INCREF(m_dict);
 }
 
 bool PyDict::empty() const

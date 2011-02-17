@@ -49,13 +49,6 @@ public:
     Py_Finalize();
   }
 
-  void test_PyDictValue() {
-    PyDictValue val;
-    val == "pwet"; "pwet" == val;
-val == std::string("pwet"); std::string("pwet") == val;
-    val = 42;
-  }
-
   void test_PyDict() {
     PyObject *obj = PyRun_String("{ 'textKey' : \"textValue\", 1 : 2, 3 : 'textValue2' }", Py_eval_input, Py_None, Py_None);
 
@@ -66,12 +59,13 @@ val == std::string("pwet"); std::string("pwet") == val;
     PyDict::iterator it = dict.begin();
 
     CPPUNIT_ASSERT(it != dict.end());
-    CPPUNIT_ASSERT_EQUAL(string("textKey"), (string) it->first);
-    CPPUNIT_ASSERT("textValue" == it->second);
+    CPPUNIT_ASSERT_EQUAL(string("1"), (string) it->first);
+    CPPUNIT_ASSERT("2" != it->second);
+    CPPUNIT_ASSERT(2 == it->second);
 
-    CPPUNIT_ASSERT_EQUAL(string("1"), (string) (++it)->first);
-    CPPUNIT_ASSERT("2" == (it++)->second);
+    CPPUNIT_ASSERT_EQUAL(string("3"), (string) (++it)->first);
     CPPUNIT_ASSERT("textValue2" == (it++)->second);
+    CPPUNIT_ASSERT("textValue" == (it++)->second);
     CPPUNIT_ASSERT(dict.end() == it);
 
     Py_DECREF(obj);

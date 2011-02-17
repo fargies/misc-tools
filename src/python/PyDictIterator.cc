@@ -28,7 +28,6 @@
 
 #include <stdexcept>
 #include <string>
-#include <iostream>
 #include "PyDict.hh"
 
 PyDictIterator::PyDictIterator(PyObject *obj) :
@@ -47,9 +46,21 @@ PyDictIterator::PyDictIterator(PyObject *obj) :
 }
 
 PyDictIterator::PyDictIterator(const PyDictIterator &it) :
-  m_dict(it.m_dict), m_pos(it.m_pos)
+  m_dict(it.m_dict), m_pos(it.m_pos), m_value(it.m_value)
 {
   Py_INCREF(m_dict);
+}
+
+PyDictIterator &PyDictIterator::operator = (const PyDictIterator &it)
+{
+  if (this != &it) {
+    m_pos = it.m_pos;
+    m_value = it.m_value;
+    Py_INCREF(it.m_dict);
+    Py_DECREF(m_dict);
+    m_dict = it.m_dict;
+  }
+  return *this;
 }
 
 PyDictIterator::~PyDictIterator()
@@ -96,24 +107,18 @@ void PyDictIterator::getNext()
     clear();
   }
   else {
-    std::cout << key->ob_type->tp_name << std::endl;
     m_value.first = key;
-    m_value.second = PyDictValue(m_dict, key);
+    m_value.second = PyDictValue(m_dict, key, value);
   }
 }
 
 void PyDictIterator::clear()
 {
-  //FIXME m_value still contains something
+  if (m_dict) {
+    Py_DECREF(m_dict);
+    m_dict = NULL;
+  }
   m_pos = -1;
- // m_value.first.clear();
- // m_value.second.clear();
-}
-
-PyDict::PyDict(PyObject *obj) throw (std::invalid_argument):
-  m_dict(obj)
-{
-  if (!PyDict_Check(obj))
-    throw std::invalid_argument("Not a PyDict");
-  Py_INCREF(m_dict);
+  m_value.first = Py_None;
+  m_value.second = PyDictValue();
 }

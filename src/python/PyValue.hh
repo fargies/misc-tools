@@ -33,7 +33,7 @@
 #include "PyError.hh"
 
 /**
- * @class PyValue convenience class to acces PyObject
+ * @class PyValue convenience class to access PyObject
  */
 class PyValue
 {
@@ -49,6 +49,7 @@ public:
   PyValue(PyObject *);
 
   PyValue(const PyValue &);
+  PyValue &operator = (const PyValue &);
 
   virtual ~PyValue();
 
@@ -57,7 +58,6 @@ public:
   PyValue &operator = (int);
   PyValue &operator = (unsigned int);
   PyValue &operator = (PyObject *);
-  PyValue &operator = (const PyValue &);
 
   operator std::string() const;
   operator int() const;

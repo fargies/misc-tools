@@ -27,8 +27,6 @@
 #include <typeinfo>
 #include "PyDict.hh"
 
-using namespace std;
-
 PyDictValue::PyDictValue(PyObject *dict, PyObject *key, PyObject *value) :
   PyValue((value == NULL) ? PyDict_GetItem(dict, key) : value),
   m_dict(dict), m_key(key)
@@ -42,6 +40,20 @@ PyDictValue::PyDictValue(const PyDictValue &value) :
 {
   Py_INCREF(m_dict);
   Py_INCREF(m_key);
+}
+
+PyDictValue &PyDictValue::operator = (const PyDictValue &value)
+{
+  if (this != &value) {
+    Py_XINCREF(value.m_dict);
+    Py_XINCREF(value.m_key);
+    Py_XDECREF(m_dict);
+    Py_XDECREF(m_key);
+    m_dict = value.m_dict;
+    m_key = value.m_key;
+    PyValue::operator = (value);
+  }
+  return *this;
 }
 
 PyDictValue::PyDictValue() :
