@@ -24,8 +24,8 @@
 **
 */
 
-#include <typeinfo>
 #include "PyDict.hh"
+#include <typeinfo>
 
 PyDictValue::PyDictValue(PyObject *dict, PyObject *key, PyObject *value) :
   PyValue((value == NULL) ? PyDict_GetItem(dict, key) : value),

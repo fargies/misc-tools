@@ -27,10 +27,10 @@
 #ifndef PYDICT_HH_
 #define PYDICT_HH_
 
+#include <Python.h>
 #include <map>
 #include <string>
 #include <iterator>
-#include <Python.h>
 
 #include "PyError.hh"
 #include "PyValue.hh"
@@ -116,11 +116,11 @@ public:
   typedef int size_type;
   //typedef size_t size_type;
 
+  PyDict();
   PyDict(PyObject *) throw (std::invalid_argument);
   PyDict(const PyDict &);
-  ~PyDict();
-
   PyDict &operator =(const PyDict &);
+  ~PyDict();
 
   /* capacity */
   bool empty() const;
@@ -157,3 +157,4 @@ protected:
 #include "PyDict.hxx"
 
 #endif /* PYDICT_HH_ */
+

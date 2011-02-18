@@ -27,8 +27,8 @@
 #ifndef PYVALUE_HH_
 #define PYVALUE_HH_
 
-#include <string>
 #include <Python.h>
+#include <string>
 
 #include "PyError.hh"
 
@@ -135,3 +135,4 @@ bool operator != (T t, const PyValue &val)
 }
 
 #endif /* PYVALUE_HH_ */
+

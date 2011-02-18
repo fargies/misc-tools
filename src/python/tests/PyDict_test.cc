@@ -37,7 +37,8 @@ using namespace std;
 class TestPyDict : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestPyDict);
-  CPPUNIT_TEST(test_PyDict);
+  CPPUNIT_TEST(test_iter);
+  CPPUNIT_TEST(test_create);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -49,7 +50,7 @@ public:
     Py_Finalize();
   }
 
-  void test_PyDict() {
+  void test_iter() {
     PyObject *obj = PyRun_String("{ 'textKey' : \"textValue\", 1 : 2, 3 : 'textValue2' }", Py_eval_input, Py_None, Py_None);
 
     CPPUNIT_ASSERT(obj != NULL);
@@ -72,6 +73,15 @@ public:
 
     CPPUNIT_ASSERT_EQUAL((Py_ssize_t) 1, obj->ob_refcnt);
     Py_DECREF(obj);
+  }
+
+  void test_create() {
+    PyDict dict;
+
+    CPPUNIT_ASSERT(dict.object() != NULL);
+    CPPUNIT_ASSERT_EQUAL((Py_ssize_t) 1, dict.object()->ob_refcnt);
+
+//    std::pair<PyDict::iterator, bool> res = dict.insert(PyDict::value_type("test", 1));
   }
 };
 

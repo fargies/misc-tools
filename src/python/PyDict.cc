@@ -32,9 +32,9 @@ PyDict::PyDict(const PyDict &dict) :
   Py_INCREF(dict.m_dict);
 }
 
-PyDict::~PyDict()
+PyDict::PyDict()
 {
-  Py_DECREF(m_dict);
+  m_dict = PyDict_New();
 }
 
 PyDict &PyDict::operator =(const PyDict &dict)
@@ -54,6 +54,11 @@ PyDict::PyDict(PyObject *obj) throw (std::invalid_argument):
   if (!PyDict_Check(obj))
     throw std::invalid_argument("Not a PyDict");
   Py_INCREF(m_dict);
+}
+
+PyDict::~PyDict()
+{
+  Py_DECREF(m_dict);
 }
 
 bool PyDict::empty() const
