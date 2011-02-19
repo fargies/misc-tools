@@ -78,8 +78,8 @@ public:
   void test_create() {
     PyDict dict;
 
-    CPPUNIT_ASSERT(dict.object() != NULL);
-    CPPUNIT_ASSERT_EQUAL((Py_ssize_t) 1, dict.object()->ob_refcnt);
+//    CPPUNIT_ASSERT(dict.object() != NULL);
+//    CPPUNIT_ASSERT_EQUAL((Py_ssize_t) 1, dict.object()->ob_refcnt);
 
 //    std::pair<PyDict::iterator, bool> res = dict.insert(PyDict::value_type("test", 1));
   }

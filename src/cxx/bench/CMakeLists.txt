@@ -26,8 +26,8 @@ endif (NOT DBUS_XML2CPP)
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/../variant)
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ../variant ${DBUS_CPP_INCLUDE_DIRS})
 add_executable(variant_dbus_bench
-               ${CMAKE_CURRENT_BINARY_DIR}/variant_dbus_proxy.hh
-               ${CMAKE_CURRENT_BINARY_DIR}/variant_dbus_adaptor.hh
+               variant_dbus_proxy.hh
+               variant_dbus_adaptor.hh
                variant_dbus_bench.cc)
 target_link_libraries(variant_dbus_bench testHelper Variant chrono)
 
