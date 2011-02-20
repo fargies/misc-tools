@@ -103,7 +103,7 @@ protected:
   void clear();
 };
 
-class PyDict {
+class PyDict : public PyValue {
 public:
   /**
    * @brief key_type defaults to string
@@ -120,6 +120,8 @@ public:
   PyDict(PyObject *) throw (std::invalid_argument);
   PyDict(const PyDict &);
   PyDict &operator =(const PyDict &);
+  PyDict &operator =(const char *);
+
   ~PyDict();
 
   /* capacity */
@@ -132,16 +134,21 @@ public:
   iterator end();
 
   /* element access */
-  mapped_type &operator[] (const key_type &);
+  mapped_type operator[] (const key_type &);
+  mapped_type operator[] (const char *);
 
   /* modifiers */
   std::pair<iterator, bool> insert(const value_type &);
   iterator insert(iterator position, const value_type &);
   template <class InputIterator>
         void insert(InputIterator first, InputIterator last);
+
   void erase(iterator &position);
   size_type erase(const key_type &);
+  template <class K>
+    size_type erase(const K&);
   void erase(iterator first, iterator last);
+
   // void swap(PyDict<K, V> &); FIXME should be implemented ?
   void clear();
 
@@ -149,9 +156,6 @@ public:
   iterator find(const key_type &);
   const_iterator find(const key_type &) const;
   size_type count(const key_type &) const;
-
-protected:
-  PyObject *m_dict;
 };
 
 #include "PyDict.hxx"

@@ -27,5 +27,13 @@
 #ifndef PYDICT_HXX_
 #define PYDICT_HXX_
 
+#include "PyDict.hh"
+
+template <class K>
+PyDict::size_type PyDict::erase(const K &key)
+{
+  erase(PyValue(key));
+}
 
 #endif /* PYDICT_HXX_ */
+

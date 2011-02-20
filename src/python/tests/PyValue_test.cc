@@ -37,6 +37,8 @@ class TestPyValue : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestPyValue);
   CPPUNIT_TEST(test_value);
+  CPPUNIT_TEST(test_copy);
+  CPPUNIT_TEST(test_constr);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -82,6 +84,32 @@ public:
     val2 = val;
     CPPUNIT_ASSERT(val2 == val);
     CPPUNIT_ASSERT(val2 == "test");
+  }
+
+  void test_copy() {
+    PyValue val, val2;
+
+    val = 2;
+    val2 = val;
+    val2 = 3;
+    CPPUNIT_ASSERT(val == 2);
+    CPPUNIT_ASSERT(val2 == 3);
+  }
+
+  void test_constr() {
+    PyValue val;
+
+    val = PyValue("test");
+    CPPUNIT_ASSERT(val == "test");
+
+    val = PyValue(std::string("teststr"));
+    CPPUNIT_ASSERT(val == "teststr");
+
+    val = PyValue((int) -1);
+    CPPUNIT_ASSERT(val == -1);
+
+    val = PyValue((unsigned int) 1);
+    CPPUNIT_ASSERT(val == 1);
   }
 };
 

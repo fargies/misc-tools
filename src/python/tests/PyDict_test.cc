@@ -78,11 +78,29 @@ public:
   void test_create() {
     PyDict dict;
 
-//    CPPUNIT_ASSERT(dict.object() != NULL);
-//    CPPUNIT_ASSERT_EQUAL((Py_ssize_t) 1, dict.object()->ob_refcnt);
+    CPPUNIT_ASSERT(dict.object() != NULL);
+    CPPUNIT_ASSERT_EQUAL((Py_ssize_t) 1, dict.object()->ob_refcnt);
 
-//    std::pair<PyDict::iterator, bool> res = dict.insert(PyDict::value_type("test", 1));
+    CPPUNIT_ASSERT(dict.empty());
+    CPPUNIT_ASSERT_EQUAL(0, dict.size());
+
+    dict["test"];
+    CPPUNIT_ASSERT_EQUAL(1, dict.size());
+    CPPUNIT_ASSERT(dict["test"] == Py_None);
+
+    dict["test"] = 2;
+    CPPUNIT_ASSERT_EQUAL(1, dict.size());
+    CPPUNIT_ASSERT(dict["test"] == 2);
+
+    dict["test"] = "string";
+    CPPUNIT_ASSERT_EQUAL(1, dict.size());
+    CPPUNIT_ASSERT(dict["test"] == "string");
+    CPPUNIT_ASSERT_EQUAL((Py_ssize_t) 1, dict.object()->ob_refcnt);
+
+    dict.erase("test");
+    CPPUNIT_ASSERT(dict.empty());
   }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestPyDict);
+

@@ -28,9 +28,16 @@
 #include <typeinfo>
 
 PyDictValue::PyDictValue(PyObject *dict, PyObject *key, PyObject *value) :
-  PyValue((value == NULL) ? PyDict_GetItem(dict, key) : value),
+  PyValue(value),
   m_dict(dict), m_key(key)
 {
+  if (value == NULL) {
+    value = PyDict_GetItem(dict, key);
+    if (value)
+      PyValue::operator = (value);
+    else
+      PyDict_SetItem(dict, key, Py_None);
+  }
   Py_INCREF(dict);
   Py_INCREF(key);
 }
@@ -108,3 +115,4 @@ PyDictValue &PyDictValue::operator = (const PyValue &value)
       PyValue::operator = (value).object());
   return *this;
 }
+

@@ -46,7 +46,11 @@ public:
   /**
    * @brief create a PyValue from a PyObject
    */
-  PyValue(PyObject *);
+  explicit PyValue(PyObject *);
+  explicit PyValue(const char *);
+  explicit PyValue(const std::string &);
+  explicit PyValue(int);
+  explicit PyValue(unsigned int);
 
   PyValue(const PyValue &);
   PyValue &operator = (const PyValue &);

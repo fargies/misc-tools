@@ -27,48 +27,42 @@
 #include "PyDict.hh"
 
 PyDict::PyDict(const PyDict &dict) :
-  m_dict(dict.m_dict)
-{
-  Py_INCREF(dict.m_dict);
-}
+  PyValue(dict.object())
+{ }
 
-PyDict::PyDict()
+PyDict::PyDict() :
+  PyValue(PyDict_New())
 {
-  m_dict = PyDict_New();
+  Py_DECREF(object());
 }
 
 PyDict &PyDict::operator =(const PyDict &dict)
 {
   if (this != &dict) {
-    Py_INCREF(dict.m_dict);
-    if (m_dict)
-      Py_DECREF(m_dict);
-    m_dict = dict.m_dict;
+    PyValue::operator = (dict);
   }
   return *this;
 }
 
-PyDict::PyDict(PyObject *obj) throw (std::invalid_argument):
-  m_dict(obj)
+PyDict::PyDict(PyObject *obj) throw (std::invalid_argument)
 {
   if (!PyDict_Check(obj))
     throw std::invalid_argument("Not a PyDict");
-  Py_INCREF(m_dict);
+  PyValue::operator = (obj);
 }
 
 PyDict::~PyDict()
 {
-  Py_DECREF(m_dict);
 }
 
 bool PyDict::empty() const
 {
-  return PyDict_Size(m_dict) == 0;
+  return PyDict_Size(m_value) == 0;
 }
 
 PyDict::size_type PyDict::size() const
 {
-  return PyDict_Size(m_dict);
+  return PyDict_Size(m_value);
 }
 
 PyDict::size_type PyDict::max_size() const
@@ -78,7 +72,7 @@ PyDict::size_type PyDict::max_size() const
 
 PyDict::iterator PyDict::begin()
 {
-  return PyDict::iterator(m_dict);
+  return PyDict::iterator(m_value);
 }
 
 PyDict::iterator PyDict::end()
@@ -86,28 +80,15 @@ PyDict::iterator PyDict::end()
   return PyDict::iterator();
 }
 
-/**
- * TODO
- * create/use const iterators
-
-template <typename K, typename V>
-typename PyDict<K, V>::const_iterator PyDict<K, V>::begin() const
+PyDict::mapped_type PyDict::operator[] (const PyDict::key_type &k)
 {
-  return PyDict<K, V>::const_iterator(m_dict);
+  return PyDictValue(m_value, k.object());
 }
 
-template <typename K, typename V>
-typename PyDict<K, V>::const_iterator end() const
+PyDict::mapped_type PyDict::operator[] (const char *k)
 {
-  return PyDict<K, V>::const_iterator(m_dict, this->size());
+  return PyDictValue(m_value, PyValue(k).object(), PyDict_GetItemString(m_value, k));
 }
-*/
-/*
-template <typename K, typename V>
-typename PyDict<K, V>::mapped_type &operator[] (const PyDict<K, V>::key_type &k)
-{
-}
-*/
 
 std::pair<PyDict::iterator, bool> PyDict::insert(const PyDict::value_type &val)
 {
@@ -130,12 +111,12 @@ void PyDict::insert(InputIterator first, InputIterator last)
 
 void PyDict::erase(PyDict::iterator &pos)
 {
-  PyDict_DelItemString(m_dict, pos->first.c_str());
+  PyDict_DelItemString(m_value, pos->first.c_str());
 }
 
 PyDict::size_type PyDict::erase(const PyDict::key_type &key)
 {
-  return (PyDict_DelItemString(m_dict, key.c_str()) == 0) ? 1 : 0;
+  return (PyDict_DelItemString(m_value, key.c_str()) == 0) ? 1 : 0;
 }
 
 void PyDict::erase(iterator first, iterator last)
@@ -147,7 +128,7 @@ void PyDict::erase(iterator first, iterator last)
 }
 
 void PyDict::clear() {
-  PyDict_Clear(m_dict);
+  PyDict_Clear(m_value);
 }
 
 /*PyDict::iterator PyDict::find(const std::string &key)

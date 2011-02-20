@@ -36,6 +36,8 @@ PyValue::PyValue() :
 PyValue::PyValue(PyObject *obj) :
   m_value(obj)
 {
+  if (obj == NULL)
+    m_value = Py_None;
   Py_INCREF(m_value);
 }
 
@@ -44,6 +46,22 @@ PyValue::PyValue(const PyValue &val) :
 {
   Py_INCREF(m_value);
 }
+
+PyValue::PyValue(const char *str) :
+  m_value(PyString_FromString(str))
+{ }
+
+PyValue::PyValue(const std::string &str) :
+  m_value(PyString_FromString(str.c_str()))
+{ }
+
+PyValue::PyValue(int i) :
+  m_value(PyInt_FromLong(i))
+{ }
+
+PyValue::PyValue(unsigned int i) :
+  m_value(PyInt_FromLong(i))
+{ }
 
 PyValue &PyValue::operator = (const PyValue &val)
 {
