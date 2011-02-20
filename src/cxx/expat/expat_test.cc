@@ -41,7 +41,7 @@ public:
 
   void startHandlerTest(const XML_Char *name, const XML_Char **attrs)
   {
-    std::cout << "startHandlerTestCalled" << std::endl;
+    std::cout << "found " << name << " start tag" << std::endl;
   }
 };
 
@@ -55,7 +55,7 @@ public:
   void test_parser() {
     ExpatTester tester;
 
-    tester.parseFile("sample.xml");
+    CPPUNIT_ASSERT_EQUAL(0, tester.parseFile("sample.xml"));
   }
 
 };

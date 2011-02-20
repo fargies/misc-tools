@@ -36,6 +36,11 @@ public:
   Expat();
   ~Expat();
 
+  /**
+   * @return
+   * - 0 on success
+   * - ENOENT the given file doesn't exist
+   */
   int parseFile(const char *file);
 
   typedef void (Parser::*StartHandler)(const XML_Char *name, const XML_Char **attrs);
@@ -44,7 +49,8 @@ public:
   StartHandler startHandler;
   EndHandler endHandler;
 
-//  static void __startHandler(void *data, const XML_Char *name, const XML_Char **attrs);
+private:
+  XML_Parser m_parser;
 };
 
 #include "expat++.hxx"

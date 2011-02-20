@@ -4,7 +4,7 @@ find_library(EXPAT expat)
 if (EXPAT)
 
 add_library(expat++ expat.cc expat++.hh)
-target_link_libraries(expat++ ${})
+target_link_libraries(expat++ expat)
 
 add_executable(expat_test expat_test.cc)
 target_link_libraries(expat_test testHelper expat++)

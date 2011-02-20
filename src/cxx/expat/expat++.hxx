@@ -27,20 +27,30 @@
 #ifndef EXPAT_HXX_
 #define EXPAT_HXX_
 
+#include <errno.h>
 #include "expat++.hh"
 
 template < class Parser >
 void __startHandler(void *data, const XML_Char *name, const XML_Char **attrs)
 {
-  Expat<Parser> *self = static_cast<Expat<Parser> *> (data);
+  Parser *self = static_cast<Parser *> (data);
   if (self->startHandler != NULL)
-    (self->*startHandler)(name, attrs);
+    (self->*(self->startHandler))(name, attrs);
 }
 
 template <class Parser>
 Expat<Parser>::Expat() :
   startHandler(NULL), endHandler(NULL)
 {
+  m_parser = XML_ParserCreate(NULL);
+  XML_SetUserData(m_parser, this);
+  XML_SetStartElementHandler(m_parser, &(__startHandler<Parser>));
+}
+
+template <class Parser>
+Expat<Parser>::~Expat()
+{
+  XML_ParserFree(m_parser);
 }
 
 #define EXPAT_BUFF_SIZE 2048
@@ -48,26 +58,28 @@ Expat<Parser>::Expat() :
 template <class Parser>
 int Expat<Parser>::parseFile(const char *name)
 {
-  XML_Parser parser = XML_ParserCreate(NULL);
   FILE *file = fopen(name, "r");
 
-  XML_SetUserData(parser, this);
-  XML_SetStartElementHandler(parser, &(__startHandler<Parser>));
+  if (file == NULL)
+    return ENOENT;
 
+  int bytes_read, ret = 0;
+  void *buff;
   while (true) {
-    int bytes_read;
-    void *buff = XML_GetBuffer(parser, EXPAT_BUFF_SIZE);
-    if (buff == NULL) {
-      /* handle error */
+    if ((buff = XML_GetBuffer(m_parser, EXPAT_BUFF_SIZE)) == NULL) {
+      ret = ENOMEM;
+      break;
     }
 
-    bytes_read = fread(buff, EXPAT_BUFF_SIZE, 1, file);
+    bytes_read = fread(buff, 1, EXPAT_BUFF_SIZE, file);
     if (bytes_read < 0) {
-      /* handle error */
+      ret = EIO;
+      break;
     }
 
-    if (! XML_ParseBuffer(parser, bytes_read, bytes_read == 0)) {
-      /* handle parse error */
+    if (!XML_ParseBuffer(m_parser, bytes_read, bytes_read == 0)) {
+      ret = EILSEQ;
+      break;
     }
 
     if (bytes_read == 0)
@@ -75,7 +87,7 @@ int Expat<Parser>::parseFile(const char *name)
   }
 
   fclose(file);
-  XML_ParserFree(parser);
+  return ret;
 }
 
 
