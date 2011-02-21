@@ -36,12 +36,16 @@
 #include "PyValue.hh"
 
 /**
- * @brief a dict value
+ * @brief a PyDict value
  * @details modifying this value directly modifies the dict's value
  */
 class PyDictValue : public PyValue
 {
 public:
+  /**
+   * @details when value is NULL, PyDict_GetItem is used to find out the real value
+   * @details creates a Py_None value in the dict if the given key is not found
+   */
   PyDictValue(PyObject *dict, PyObject *key, PyObject *value = NULL);
   PyDictValue(const PyDictValue &);
   PyDictValue &operator = (const PyDictValue &);
@@ -63,9 +67,16 @@ class PyDictIterator :
   public std::iterator<std::input_iterator_tag, std::pair<PyValue, PyDictValue > >
 {
 public:
+  /**
+   * @name typedefs
+   * @{
+   */
   typedef std::pair<PyValue, PyDictValue> value_type;
   typedef value_type & reference;
   typedef value_type * pointer;
+  /**
+   * @}
+   */
 
   /**
    * @details iterate from the beginning of the dict
@@ -74,13 +85,28 @@ public:
   PyDictIterator(const PyDictIterator &);
   PyDictIterator &operator = (const PyDictIterator &);
   ~PyDictIterator();
+
+  /**
+   * @name operations
+   * @{
+   */
   PyDictIterator& operator ++();
   PyDictIterator operator ++(int);
   bool operator ==(const PyDictIterator &rhs) const;
   bool operator !=(const PyDictIterator &rhs) const;
+  /**
+   * @}
+   */
 
+  /**
+   * @name element access
+   * @{
+   */
   reference operator *();
   pointer operator ->();
+  /**
+   * @}
+   */
 
 protected:
   /**
@@ -106,7 +132,8 @@ protected:
 class PyDict : public PyValue {
 public:
   /**
-   * @brief key_type defaults to string
+   * @name typedefs
+   * @{
    */
   typedef PyValue key_type;
   typedef PyDictValue mapped_type;
@@ -114,30 +141,52 @@ public:
   typedef PyDictIterator iterator;
   typedef PyDictIterator const_iterator;
   typedef int size_type;
-  //typedef size_t size_type;
+  /**
+   * @}
+   */
 
   PyDict();
   PyDict(PyObject *) throw (std::invalid_argument);
   PyDict(const PyDict &);
   PyDict &operator =(const PyDict &);
-  PyDict &operator =(const char *);
 
   ~PyDict();
 
-  /* capacity */
+  /**
+   * @name capacity related methods
+   * @{
+   */
   bool empty() const;
   size_type size() const;
   size_type max_size() const;
+  /**
+   * @}
+   */
 
-  /* iterators */
+  /**
+   * @name iterators
+   * @{
+   */
   iterator begin();
   iterator end();
+  /**
+   * @}
+   */
 
-  /* element access */
+  /**
+   * @name element access
+   * @{
+   */
   mapped_type operator[] (const key_type &);
   mapped_type operator[] (const char *);
+  /**
+   * @}
+   */
 
-  /* modifiers */
+  /**
+   * @name modifiers
+   * @{
+   */
   std::pair<iterator, bool> insert(const value_type &);
   iterator insert(iterator position, const value_type &);
   template <class InputIterator>
@@ -145,17 +194,26 @@ public:
 
   void erase(iterator &position);
   size_type erase(const key_type &);
+  void erase(iterator first, iterator last);
   template <class K>
     size_type erase(const K&);
-  void erase(iterator first, iterator last);
 
   // void swap(PyDict<K, V> &); FIXME should be implemented ?
   void clear();
+  /**
+   * @}
+   */
 
-  /* operations */
+  /**
+   * @name operations
+   * @{
+   */
   iterator find(const key_type &);
   const_iterator find(const key_type &) const;
   size_type count(const key_type &) const;
+  /**
+   * @}
+   */
 };
 
 #include "PyDict.hxx"
