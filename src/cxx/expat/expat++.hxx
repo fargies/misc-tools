@@ -30,27 +30,79 @@
 #include <errno.h>
 #include "expat++.hh"
 
-template < class Parser >
-void __startHandler(void *data, const XML_Char *name, const XML_Char **attrs)
+template <class Parser>
+void __startHdlr(void *data, const XML_Char *name, const XML_Char **attrs)
 {
   Parser *self = static_cast<Parser *> (data);
-  if (self->startHandler != NULL)
-    (self->*(self->startHandler))(name, attrs);
+  if (self->start != NULL) {
+    self->m_raw_attrs = attrs;
+    self->m_attrs.clear();
+    (self->*(self->start))(name);
+  }
+}
+
+template <class Parser>
+void __endHdlr(void *data, const XML_Char *name)
+{
+  Parser *self = static_cast<Parser *> (data);
+  if (self->end != NULL)
+    (self->*(self->end))(name);
+}
+
+template <class Parser>
+void __dataHdlr(void *data, const XML_Char *str, int size)
+{
+  Parser *self = static_cast<Parser *> (data);
+  if (self->m_accu != NULL)
+    self->m_accu->append(str, size);
 }
 
 template <class Parser>
 Expat<Parser>::Expat() :
-  startHandler(NULL), endHandler(NULL)
+  start(NULL), end(NULL), m_accu(NULL)
 {
   m_parser = XML_ParserCreate(NULL);
   XML_SetUserData(m_parser, this);
-  XML_SetStartElementHandler(m_parser, &(__startHandler<Parser>));
+  XML_SetStartElementHandler(m_parser, &(__startHdlr<Parser>));
+  XML_SetEndElementHandler(m_parser, &(__endHdlr<Parser>));
+  XML_SetCharacterDataHandler(m_parser, NULL);
 }
 
 template <class Parser>
 Expat<Parser>::~Expat()
 {
   XML_ParserFree(m_parser);
+}
+
+template <class Parser>
+void Expat<Parser>::addDataWatch(std::string *accu)
+{
+  if (accu != NULL)
+    m_accu = accu;
+  else {
+    m_data.clear();
+    m_accu = &m_data;
+  }
+  XML_SetCharacterDataHandler(m_parser, &(__dataHdlr<Parser>));
+}
+
+template <class Parser>
+void Expat<Parser>::removeDataWatch()
+{
+  m_accu = NULL;
+  XML_SetCharacterDataHandler(m_parser, NULL);
+}
+
+template <class Parser>
+std::map<std::string, const XML_Char *> &Expat<Parser>::attributes()
+{
+  if (m_raw_attrs && m_attrs.empty()) {
+    while (*m_raw_attrs != NULL) {
+      const XML_Char *key = *(m_raw_attrs++);
+      m_attrs[key] = *(m_raw_attrs++);
+    }
+  }
+  return m_attrs;
 }
 
 #define EXPAT_BUFF_SIZE 2048
@@ -90,5 +142,5 @@ int Expat<Parser>::parseFile(const char *name)
   return ret;
 }
 
-
 #endif /* EXPAT_HXX_ */
+

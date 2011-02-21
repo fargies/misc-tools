@@ -27,6 +27,8 @@
 #ifndef EXPATPP_H_
 #define EXPATPP_H_
 
+#include <map>
+#include <string>
 #include <expat.h>
 
 template <class Parser>
@@ -40,17 +42,49 @@ public:
    * @return
    * - 0 on success
    * - ENOENT the given file doesn't exist
+   * - EIO when something went wrong while trying to read the file
+   * - EILSEQ when something failed while parsing
    */
   int parseFile(const char *file);
 
-  typedef void (Parser::*StartHandler)(const XML_Char *name, const XML_Char **attrs);
-  typedef void (Parser::*EndHandler)(const XML_Char *name);
+  typedef void (Parser::*Handler)(const std::string &name);
+  typedef std::map<std::string, const XML_Char *> Attributes;
 
-  StartHandler startHandler;
-  EndHandler endHandler;
+  /**
+   * @brief accumulate items data
+   * @details if accu is NULL, an internal accumulator will be used (m_data)
+   * @param accu the data accumulator
+   */
+  void addDataWatch(std::string *accu);
+  void removeDataWatch();
 
+  /**
+   * @brief returns current item attributes
+   * @details must be used only in startHandler
+   */
+  Attributes &attributes();
 private:
   XML_Parser m_parser;
+  std::string *m_accu;
+  const XML_Char **m_raw_attrs;
+  Attributes m_attrs;
+
+protected:
+  std::string m_data;
+
+  /**
+   * @brief xml item start handler
+   */
+  Handler start;
+
+  /**
+   * @brief xml item end handler
+   */
+  Handler end;
+
+  template <class P> friend void __startHdlr(void *, const XML_Char *, const XML_Char **);
+  template<class P> friend void __endHdlr(void *, const XML_Char *);
+  template<class P> friend void __dataHdlr(void *, const XML_Char *, int);
 };
 
 #include "expat++.hxx"

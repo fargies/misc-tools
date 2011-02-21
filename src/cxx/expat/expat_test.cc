@@ -36,12 +36,34 @@ class ExpatTester : public Expat<ExpatTester>
 public:
   ExpatTester()
   {
-    startHandler = &ExpatTester::startHandlerTest;
+    start = &ExpatTester::startHandlerTest;
+    end = &ExpatTester::endHandlerTest;
   }
 
-  void startHandlerTest(const XML_Char *name, const XML_Char **attrs)
+  void startHandlerTest(const std::string &name)
   {
     std::cout << "found " << name << " start tag" << std::endl;
+    if (name == "item")
+      addDataWatch(NULL);
+
+    Attributes &attr = attributes();
+    for (Attributes::const_iterator it = attr.begin();
+         it != attr.end(); ++it) {
+      std::cout << "  attribute: " << it->first << " : " <<
+        it->second << std::endl;
+    }
+  }
+
+  void endHandlerTest(const std::string &name)
+  {
+    std::cout << "found " << name << " end tag" << std::endl;
+    if (name == "item") {
+      if (!m_data.empty()) {
+        std::cout << "  data: " << m_data << std::endl;
+        m_data.clear();
+      }
+      removeDataWatch();
+    }
   }
 };
 
@@ -61,3 +83,4 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestExpat);
+
