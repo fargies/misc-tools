@@ -1,7 +1,7 @@
 
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/..)
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/../sem)
-include_directories(.. ../sem)
+include_directories(.. ../sem ${CMAKE_BINARY_DIR})
 
 include(FindPkgConfig)
 pkg_check_modules(CPPUNIT cppunit) 

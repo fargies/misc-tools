@@ -29,4 +29,6 @@
 
 #cmakedefine DBUS_CPP_FOUND
 
+#cmakedefine HAVE_GETOPT_LONG
+
 #endif /* CONFIG_H_ */
