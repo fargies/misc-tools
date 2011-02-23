@@ -25,7 +25,6 @@
 */
 
 #include "PyValue.hh"
-#include <iostream>
 
 PyValue::PyValue() :
   m_value(Py_None)

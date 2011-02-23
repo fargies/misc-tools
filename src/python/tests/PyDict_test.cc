@@ -39,6 +39,8 @@ class TestPyDict : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestPyDict);
   CPPUNIT_TEST(test_iter);
   CPPUNIT_TEST(test_create);
+  CPPUNIT_TEST(test_find);
+  CPPUNIT_TEST(test_find_iter);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -99,6 +101,42 @@ public:
 
     dict.erase("test");
     CPPUNIT_ASSERT(dict.empty());
+  }
+
+  void test_find() {
+    PyDict dict;
+
+    dict["item1"] = "1";
+    dict["item2"] = "2";
+    dict["item3"] = "3";
+
+    PyDict::iterator it = dict.find("item1");
+    CPPUNIT_ASSERT(it != dict.end());
+    CPPUNIT_ASSERT(it->first == "item1");
+    CPPUNIT_ASSERT(it->second == "1");
+
+    it = dict.find(PyValue("item2"));
+    CPPUNIT_ASSERT(it != dict.end());
+    CPPUNIT_ASSERT(it->first == "item2");
+    CPPUNIT_ASSERT(it->second == "2");
+
+    it = dict.find(PyValue(3));
+    CPPUNIT_ASSERT(it == dict.end());
+  }
+
+  void test_find_iter() {
+    PyDict dict;
+
+    dict["item1"] = "1";
+    dict["item2"] = "2";
+    dict["item3"] = "3";
+
+    PyDict::iterator it = dict.find("item3");
+    CPPUNIT_ASSERT(it != dict.end());
+    CPPUNIT_ASSERT(++it != dict.end());
+    CPPUNIT_ASSERT(it->first == "item2");
+    CPPUNIT_ASSERT((++it)->first == "item3");
+    CPPUNIT_ASSERT((++it)->first == "item1");
   }
 };
 

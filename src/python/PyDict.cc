@@ -131,6 +131,12 @@ void PyDict::clear() {
   PyDict_Clear(m_value);
 }
 
-/*PyDict::iterator PyDict::find(const std::string &key)
+PyDict::iterator PyDict::find(const PyDict::key_type &key)
 {
-}*/
+  PyObject *obj = PyDict_GetItem(m_value, key.object());
+
+  if (obj)
+    return PyDict::iterator(m_value, key.object(), obj);
+  else
+    return end();
+}

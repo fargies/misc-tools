@@ -43,7 +43,7 @@ class PyDictValue : public PyValue
 {
 public:
   /**
-   * @details when value is NULL, PyDict_GetItem is used to find out the real value
+   * @details when value is NULL,  PyDict_GetItem is used to find out the real value
    * @details creates a Py_None value in the dict if the given key is not found
    */
   PyDictValue(PyObject *dict, PyObject *key, PyObject *value = NULL);
@@ -117,9 +117,8 @@ protected:
 
   /**
    * @details
-   *  - Set to -1 when the iterator can't be moved
-   *    (when using find on the PyDict).
-   *  - 0 when we're at the beginnig of the iterator
+   *  - Set to -1 when we're at the end of the iterator
+   *  - 0 when we haven't started to iterate (used by PyDict::find)
    */
   Py_ssize_t m_pos;
 
@@ -127,6 +126,17 @@ protected:
 
   void getNext();
   void clear();
+
+  /**
+   * @details protected constructor used to iterate directly on an item
+   * (mostly used in PyDict::find)
+   */
+  PyDictIterator(PyObject *obj, PyObject *key, PyObject *value);
+
+  /**
+   * @details PyDict::find uses protected constructor
+   */
+  friend class PyDict;
 };
 
 class PyDict : public PyValue {
@@ -195,6 +205,11 @@ public:
   void erase(iterator &position);
   size_type erase(const key_type &);
   void erase(iterator first, iterator last);
+
+  /**
+   * @details Convenience template.\n
+   * Might be used by any PyValue convertible type.
+   */
   template <class K>
     size_type erase(const K&);
 
@@ -206,11 +221,20 @@ public:
 
   /**
    * @name operations
+   * @note @ref iterator returned by @ref find should not be considered as a positional iterator,\n
+   * using operator ++ on it will reset it's value and start an iteration from the beginning of the PyDict.
    * @{
    */
   iterator find(const key_type &);
   const_iterator find(const key_type &) const;
   size_type count(const key_type &) const;
+
+  /**
+   * @details Convenience template.\n
+   * Might be used by any PyValue convertible type.
+   */
+  template <class K>
+    iterator find(const K&);
   /**
    * @}
    */
