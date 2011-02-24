@@ -29,17 +29,5 @@
 
 #include "PyDict.hh"
 
-template <class K>
-PyDict::size_type PyDict::erase(const K &key)
-{
-  erase(PyValue(key));
-}
-
-template <class K>
-PyDict::iterator PyDict::find(const K &key)
-{
-  return find(PyValue(key));
-}
-
 #endif /* PYDICT_HXX_ */
 

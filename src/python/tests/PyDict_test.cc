@@ -39,8 +39,10 @@ class TestPyDict : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestPyDict);
   CPPUNIT_TEST(test_iter);
   CPPUNIT_TEST(test_create);
+  CPPUNIT_TEST(test_insert);
   CPPUNIT_TEST(test_find);
   CPPUNIT_TEST(test_find_iter);
+  CPPUNIT_TEST(test_count);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -103,6 +105,14 @@ public:
     CPPUNIT_ASSERT(dict.empty());
   }
 
+  void test_insert() {
+    PyDict dict;
+
+    std::pair<PyDictIterator, bool> res;
+
+    //res = dict.insert(make_pair(PyValue("toto"), PyValue("test")));
+  }
+
   void test_find() {
     PyDict dict;
 
@@ -137,6 +147,19 @@ public:
     CPPUNIT_ASSERT(it->first == "item2");
     CPPUNIT_ASSERT((++it)->first == "item3");
     CPPUNIT_ASSERT((++it)->first == "item1");
+  }
+
+  void test_count() {
+    PyDict dict;
+
+    dict["item1"] = "1";
+    dict[2] = 2;
+
+    CPPUNIT_ASSERT_EQUAL(1, dict.count("item1"));
+    CPPUNIT_ASSERT_EQUAL(1, dict.count(PyValue("item1")));
+    CPPUNIT_ASSERT_EQUAL(0, dict.count("item2"));
+    CPPUNIT_ASSERT_EQUAL(1, dict.count(2));
+    CPPUNIT_ASSERT_EQUAL(0, dict.count("2"));
   }
 };
 

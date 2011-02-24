@@ -168,7 +168,7 @@ public:
    */
   bool empty() const;
   size_type size() const;
-  size_type max_size() const;
+  size_type max_size() const; //TODO
   /**
    * @}
    */
@@ -197,24 +197,17 @@ public:
    * @name modifiers
    * @{
    */
-  std::pair<iterator, bool> insert(const value_type &);
-  iterator insert(iterator position, const value_type &);
+  std::pair<iterator, bool> insert(const value_type &); //TODO test
+  iterator insert(iterator position, const value_type &); //TODO test
   template <class InputIterator>
         void insert(InputIterator first, InputIterator last);
 
-  void erase(iterator &position);
-  size_type erase(const key_type &);
-  void erase(iterator first, iterator last);
-
-  /**
-   * @details Convenience template.\n
-   * Might be used by any PyValue convertible type.
-   */
-  template <class K>
-    size_type erase(const K&);
+  void erase(iterator &position); //TODO test
+  size_type erase(const key_type &); //TODO test
+  void erase(iterator first, iterator last); //TODO test
 
   // void swap(PyDict<K, V> &); FIXME should be implemented ?
-  void clear();
+  void clear(); //TODO test
   /**
    * @}
    */
@@ -226,15 +219,41 @@ public:
    * @{
    */
   iterator find(const key_type &);
-  const_iterator find(const key_type &) const;
+  const_iterator find(const key_type &) const; //TODO
   size_type count(const key_type &) const;
+  /**
+   * @}
+   */
 
   /**
-   * @details Convenience template.\n
-   * Might be used by any PyValue convertible type.
+   * @name templates
+   * @note Convenience template.\n
+   * Might be used with any PyValue convertible type.
+   * @{
    */
   template <class K>
-    iterator find(const K&);
+  inline size_type erase(const K &key)
+  {
+    return erase(PyValue(key));
+  }
+
+  template <class K>
+  inline iterator find(const K &key)
+  {
+    return find(PyValue(key));
+  }
+
+  template <class K>
+  inline size_type count(const K &key) const
+  {
+    return count(PyValue(key));
+  }
+
+  template <class K>
+  inline mapped_type operator[] (const K &key)
+  {
+    return operator[](PyValue(key));
+  }
   /**
    * @}
    */
@@ -243,4 +262,3 @@ public:
 #include "PyDict.hxx"
 
 #endif /* PYDICT_HH_ */
-

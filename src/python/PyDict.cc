@@ -92,11 +92,29 @@ PyDict::mapped_type PyDict::operator[] (const char *k)
 
 std::pair<PyDict::iterator, bool> PyDict::insert(const PyDict::value_type &val)
 {
+  PyObject *obj = PyDict_GetItem(m_value, val.first.object());
+
+  if (obj) {
+    return make_pair(PyDict::iterator(m_value, val.first.object(), obj), false);
+  }
+  else {
+    PyDict_SetItem(m_value, val.first.object(), val.second.object());
+    return make_pair(PyDict::iterator(m_value, val.first.object(), val.second.object()), true);
+  }
 }
 
 PyDict::iterator PyDict::insert(PyDict::iterator pos,
                                 const PyDict::value_type &val)
 {
+  PyObject *obj = PyDict_GetItem(m_value, val.first.object());
+
+  if (obj) {
+    return PyDict::iterator(m_value, val.first.object(), obj);
+  }
+  else {
+    PyDict_SetItem(m_value, val.first.object(), val.second.object());
+    return PyDict::iterator(m_value, val.first.object(), val.second.object());
+  }
 }
 
 template <class InputIterator>
@@ -111,12 +129,12 @@ void PyDict::insert(InputIterator first, InputIterator last)
 
 void PyDict::erase(PyDict::iterator &pos)
 {
-  PyDict_DelItemString(m_value, pos->first.c_str());
+  PyDict_DelItem(m_value, pos->first.object());
 }
 
 PyDict::size_type PyDict::erase(const PyDict::key_type &key)
 {
-  return (PyDict_DelItemString(m_value, key.c_str()) == 0) ? 1 : 0;
+  return (PyDict_DelItem(m_value, key.object()) == 0) ? 1 : 0;
 }
 
 void PyDict::erase(iterator first, iterator last)
@@ -139,4 +157,10 @@ PyDict::iterator PyDict::find(const PyDict::key_type &key)
     return PyDict::iterator(m_value, key.object(), obj);
   else
     return end();
+}
+
+
+PyDict::size_type PyDict::count(const PyDict::key_type &key) const
+{
+  return (PyDict_Contains(m_value, key.object()) == 1)? 1 : 0;
 }
