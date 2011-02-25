@@ -181,3 +181,9 @@ const char *PyValue::c_str() const throw (PyError)
   }
   return ret;
 }
+
+std::ostream &operator << (std::ostream &oss, const PyValue &val)
+{
+    return oss << val.operator std::string();
+}
+

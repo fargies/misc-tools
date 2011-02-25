@@ -29,6 +29,7 @@
 
 #include <Python.h>
 #include <string>
+#include <iostream>
 
 #include "PyError.hh"
 
@@ -113,7 +114,6 @@ protected:
   PyObject *m_value;
 };
 
-
 /**
  * @details Comparison template used to revert parameters
  * @param t the templated item to compare
@@ -137,6 +137,12 @@ bool operator != (T t, const PyValue &val)
 {
   return !val.operator == (t);
 }
+
+/**
+ * @brief ostream serialization
+ * @details uses operator std::string to serialize data
+ */
+std::ostream &operator << (std::ostream &, const PyValue &);
 
 #endif /* PYVALUE_HH_ */
 

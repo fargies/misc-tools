@@ -52,13 +52,13 @@ PyDictValue::PyDictValue(const PyDictValue &value) :
 PyDictValue &PyDictValue::operator = (const PyDictValue &value)
 {
   if (this != &value) {
-    Py_XINCREF(value.m_dict);
-    Py_XINCREF(value.m_key);
-    Py_XDECREF(m_dict);
-    Py_XDECREF(m_key);
-    m_dict = value.m_dict;
-    m_key = value.m_key;
-    PyValue::operator = (value);
+    if (!m_dict && !m_key) {
+        Py_XINCREF(value.m_dict);
+        Py_XINCREF(value.m_key);
+        m_dict = value.m_dict;
+        m_key = value.m_key;
+    }
+    operator = (value.object());
   }
   return *this;
 }
