@@ -27,8 +27,11 @@
 #include "PyDict.hh"
 
 PyDict::PyDict(const PyDict &dict) :
-  PyValue(dict.object())
-{ }
+  PyValue(PyDict_Copy(dict.object()))
+{
+  /* Drop the PyDict_Copy refcount (PyValue holds one now) */
+  Py_DECREF(this->object());
+}
 
 PyDict::PyDict() :
   PyValue(PyDict_New())
@@ -39,7 +42,8 @@ PyDict::PyDict() :
 PyDict &PyDict::operator =(const PyDict &dict)
 {
   if (this != &dict) {
-    PyValue::operator = (dict);
+    PyValue::operator = (PyDict_Copy(dict.object()));
+    Py_DECREF(this->object());
   }
   return *this;
 }
@@ -51,8 +55,28 @@ PyDict::PyDict(PyObject *obj) throw (std::invalid_argument)
   PyValue::operator = (obj);
 }
 
+PyDict &PyDict::operator =(PyObject *obj) throw (std::invalid_argument)
+{
+  if (this->object() != obj) {
+    if (!PyDict_Check(obj))
+      throw std::invalid_argument("Not a PyDict");
+    PyValue::operator = (obj);
+  }
+  return *this;
+}
+
 PyDict::~PyDict()
 {
+}
+
+bool PyDict::operator ==(const PyDict &dict) const
+{
+  return PyValue::operator == (static_cast<const PyValue &> (dict));
+}
+
+bool PyDict::operator !=(const PyDict &dict) const
+{
+  return PyValue::operator != (static_cast<const PyValue &> (dict));
 }
 
 bool PyDict::empty() const
@@ -80,12 +104,12 @@ PyDict::iterator PyDict::end()
   return PyDict::iterator();
 }
 
-PyDict::mapped_type PyDict::operator[] (const PyDict::key_type &k)
+PyDict::reference PyDict::operator[] (const PyDict::key_type &k)
 {
   return PyDictValue(m_value, k.object());
 }
 
-PyDict::mapped_type PyDict::operator[] (const char *k)
+PyDict::reference PyDict::operator[] (const char *k)
 {
   return PyDictValue(m_value, PyValue(k).object(), PyDict_GetItemString(m_value, k));
 }

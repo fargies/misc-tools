@@ -43,6 +43,7 @@ class TestPyDict : public CppUnit::TestFixture
   CPPUNIT_TEST(test_find);
   CPPUNIT_TEST(test_find_iter);
   CPPUNIT_TEST(test_count);
+  CPPUNIT_TEST(test_copy);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -108,9 +109,20 @@ public:
   void test_insert() {
     PyDict dict;
 
-    std::pair<PyDictIterator, bool> res;
+    std::pair<PyDict::iterator, bool> res;
 
-    //res = dict.insert(make_pair(PyValue("toto"), PyValue("test")));
+    res = dict.insert(make_pair(PyValue("toto"), PyValue("test")));
+    CPPUNIT_ASSERT(res.first != dict.end());
+    CPPUNIT_ASSERT(res.second == true);
+    CPPUNIT_ASSERT(res.first->first == "toto");
+    CPPUNIT_ASSERT(res.first->second == "test");
+
+    res = dict.insert(make_pair(PyValue("toto"), PyValue("test2")));
+    CPPUNIT_ASSERT(res.first != dict.end());
+    CPPUNIT_ASSERT(res.second == false);
+    CPPUNIT_ASSERT(res.first->second == "test");
+    CPPUNIT_ASSERT(dict["toto"] == "test");
+
   }
 
   void test_find() {
@@ -160,6 +172,26 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, dict.count("item2"));
     CPPUNIT_ASSERT_EQUAL(1, dict.count(2));
     CPPUNIT_ASSERT_EQUAL(0, dict.count("2"));
+  }
+
+  void test_copy() {
+    PyDict dict1, dict2;
+
+    dict2["test"] = 42;
+
+    dict1 = dict2;
+    CPPUNIT_ASSERT(dict1.count("test") == 1);
+    CPPUNIT_ASSERT(dict1 == dict2);
+
+    dict2["test2"] = 43;
+    CPPUNIT_ASSERT(dict1.count("test2") == 0);
+    CPPUNIT_ASSERT(dict1 != dict2);
+
+    dict1["test2"] = dict2["test2"];
+    CPPUNIT_ASSERT(dict1 == dict2);
+
+    dict1["test3"] = dict2["test3"] = 44;
+    CPPUNIT_ASSERT(dict1 == dict2);
   }
 };
 

@@ -146,7 +146,8 @@ public:
    * @{
    */
   typedef PyValue key_type;
-  typedef PyDictValue mapped_type;
+  typedef PyValue mapped_type;
+  typedef PyDictValue reference;
   typedef std::pair<const key_type, mapped_type> value_type;
   typedef PyDictIterator iterator;
   typedef PyDictIterator const_iterator;
@@ -155,12 +156,29 @@ public:
    * @}
    */
 
+  /**
+   * @brief creates a new dict
+   */
   PyDict();
+
+  /**
+   * @brief create a dict from a PyObject
+   * @details does not duplicates PyObject's contents
+   */
   PyDict(PyObject *) throw (std::invalid_argument);
+  PyDict &operator =(PyObject *) throw (std::invalid_argument);
+
+  /**
+   * @brief copy existing PyDict
+   * @details duplicates the PyObject
+   */
   PyDict(const PyDict &);
   PyDict &operator =(const PyDict &);
 
   ~PyDict();
+
+  bool operator ==(const PyDict &) const;
+  bool operator !=(const PyDict &) const;
 
   /**
    * @name capacity related methods
@@ -187,8 +205,8 @@ public:
    * @name element access
    * @{
    */
-  mapped_type operator[] (const key_type &);
-  mapped_type operator[] (const char *);
+  reference operator[] (const key_type &);
+  reference operator[] (const char *);
   /**
    * @}
    */
@@ -197,7 +215,7 @@ public:
    * @name modifiers
    * @{
    */
-  std::pair<iterator, bool> insert(const value_type &); //TODO test
+  std::pair<iterator, bool> insert(const value_type &);
   iterator insert(iterator position, const value_type &); //TODO test
   template <class InputIterator>
         void insert(InputIterator first, InputIterator last);
@@ -250,7 +268,7 @@ public:
   }
 
   template <class K>
-  inline mapped_type operator[] (const K &key)
+  inline reference operator[] (const K &key)
   {
     return operator[](PyValue(key));
   }
