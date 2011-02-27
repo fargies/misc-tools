@@ -123,6 +123,19 @@ public:
     CPPUNIT_ASSERT(res.first->second == "test");
     CPPUNIT_ASSERT(dict["toto"] == "test");
 
+    dict.clear();
+    CPPUNIT_ASSERT(dict.empty());
+
+    PyDict::iterator it = dict.insert(dict.begin(),
+        make_pair(PyValue("toto"), PyValue("test2")));
+    CPPUNIT_ASSERT(it != dict.end());
+    CPPUNIT_ASSERT(it->first == "toto");
+    CPPUNIT_ASSERT(it->second == "test2");
+
+    it = dict.insert(dict.begin(),
+        make_pair(PyValue("toto"), PyValue("test3")));
+    CPPUNIT_ASSERT(it != dict.end());
+    CPPUNIT_ASSERT(it->second == "test2");
   }
 
   void test_find() {

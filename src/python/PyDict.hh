@@ -216,7 +216,7 @@ public:
    * @{
    */
   std::pair<iterator, bool> insert(const value_type &);
-  iterator insert(iterator position, const value_type &); //TODO test
+  iterator insert(iterator position, const value_type &);
   template <class InputIterator>
         void insert(InputIterator first, InputIterator last);
 

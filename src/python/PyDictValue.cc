@@ -76,43 +76,48 @@ PyDictValue::~PyDictValue()
 
 PyDictValue &PyDictValue::operator = (const char *value)
 {
-  PyDict_SetItem(m_dict, m_key,
-      PyValue::operator = (value).object());
+  if (m_dict && m_key)
+    PyDict_SetItem(m_dict, m_key,
+        PyValue::operator = (value).object());
   return *this;
 }
 
 PyDictValue &PyDictValue::operator = (const std::string &value)
 {
-  PyDict_SetItem(m_dict, m_key,
-      PyValue::operator = (value).object());
+  if (m_dict && m_key)
+    PyDict_SetItem(m_dict, m_key,
+        PyValue::operator = (value).object());
   return *this;
 }
 
 PyDictValue &PyDictValue::operator = (int value)
 {
-  PyDict_SetItem(m_dict, m_key,
-      PyValue::operator = (value).object());
+  if (m_dict && m_key)
+    PyDict_SetItem(m_dict, m_key,
+        PyValue::operator = (value).object());
   return *this;
 }
 
 PyDictValue &PyDictValue::operator = (unsigned int value)
 {
-  PyDict_SetItem(m_dict, m_key,
-      PyValue::operator = (value).object());
+  if (m_dict && m_key)
+    PyDict_SetItem(m_dict, m_key,
+        PyValue::operator = (value).object());
   return *this;
 }
 
 PyDictValue &PyDictValue::operator = (PyObject *value)
 {
-  PyDict_SetItem(m_dict, m_key,
-      PyValue::operator = (value).object());
+  if (m_dict && m_key)
+    PyDict_SetItem(m_dict, m_key,
+        PyValue::operator = (value).object());
   return *this;
 }
 
 PyDictValue &PyDictValue::operator = (const PyValue &value)
 {
-  PyDict_SetItem(m_dict, m_key,
-      PyValue::operator = (value).object());
+  if (m_dict && m_key)
+    PyDict_SetItem(m_dict, m_key,
+        PyValue::operator = (value).object());
   return *this;
 }
-
