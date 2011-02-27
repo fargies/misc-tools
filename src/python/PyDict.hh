@@ -140,7 +140,7 @@ public:
   typedef std::pair<const key_type, mapped_type> value_type;
   typedef PyDictIterator iterator;
   typedef PyDictIterator const_iterator;
-  typedef int size_type;
+  typedef size_t size_type;
   /**
    * @}
    */
@@ -158,7 +158,11 @@ public:
    */
   bool empty() const;
   size_type size() const;
-  size_type max_size() const;
+  inline size_type max_size() const throw ()
+  {
+    return size_t(-1) / sizeof(PyObject);
+  };
+
   /**
    * @}
    */
@@ -208,9 +212,9 @@ public:
    * @name operations
    * @{
    */
-  iterator find(const key_type &);
-  const_iterator find(const key_type &) const;
-  size_type count(const key_type &) const;
+  iterator find(const key_type &); // TODO
+  const_iterator find(const key_type &) const; //TODO
+  size_type count(const key_type &) const; //TODO
   /**
    * @}
    */

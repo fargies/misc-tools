@@ -65,11 +65,6 @@ PyDict::size_type PyDict::size() const
   return PyDict_Size(m_value);
 }
 
-PyDict::size_type PyDict::max_size() const
-{
-  return 0; //TODO
-}
-
 PyDict::iterator PyDict::begin()
 {
   return PyDict::iterator(m_value);
@@ -104,14 +99,14 @@ void PyDict::insert(InputIterator first, InputIterator last)
 {
   PyDict::iterator it = this->begin();
   while (first != last) {
-    it = insert(it, first);
+    it = insert(it, *first);
     ++first;
   }
 }
 
 void PyDict::erase(PyDict::iterator &pos)
 {
-  PyDict_DelItemString(m_value, pos->first.c_str());
+  PyDict_DelItem(m_value, pos->first.object());
 }
 
 PyDict::size_type PyDict::erase(const PyDict::key_type &key)
