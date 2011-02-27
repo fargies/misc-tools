@@ -43,7 +43,7 @@ class PyDictValue : public PyValue
 {
 public:
   /**
-   * @details when value is NULL, PyDict_GetItem is used to find out the real value
+   * @details when value is NULL,  PyDict_GetItem is used to find out the real value
    * @details creates a Py_None value in the dict if the given key is not found
    */
   PyDictValue(PyObject *dict, PyObject *key, PyObject *value = NULL);
@@ -52,12 +52,26 @@ public:
   PyDictValue();
   virtual ~PyDictValue();
 
-  PyDictValue &operator = (const char *);
-  PyDictValue &operator = (const std::string &);
-  PyDictValue &operator = (int);
-  PyDictValue &operator = (unsigned int);
-  PyDictValue &operator = (PyObject *);
-  PyDictValue &operator = (const PyValue &);
+  /**
+   * @name templates
+   * @note Convenience template.\n
+   * Might be used with any PyValue convertible type.
+   * @{
+   */
+  template <typename T>
+  PyDictValue &operator =(const T &value)
+  {
+    if (m_dict && m_key)
+      PyDict_SetItem(m_dict, m_key,
+          PyValue::operator = (value).object());
+    else
+      PyValue::operator = (value);
+    return *this;
+  }
+  /**
+   * @}
+   */
+
 
 protected:
   mutable PyObject *m_dict, *m_key;
@@ -117,9 +131,8 @@ protected:
 
   /**
    * @details
-   *  - Set to -1 when the iterator can't be moved
-   *    (when using find on the PyDict).
-   *  - 0 when we're at the beginnig of the iterator
+   *  - Set to -1 when we're at the end of the iterator
+   *  - 0 when we haven't started to iterate (used by PyDict::find)
    */
   Py_ssize_t m_pos;
 
@@ -127,6 +140,17 @@ protected:
 
   void getNext();
   void clear();
+
+  /**
+   * @details protected constructor used to iterate directly on an item
+   * (mostly used in PyDict::find)
+   */
+  PyDictIterator(PyObject *obj, PyObject *key, PyObject *value);
+
+  /**
+   * @details PyDict::find uses protected constructor
+   */
+  friend class PyDict;
 };
 
 class PyDict : public PyValue {
@@ -136,7 +160,8 @@ public:
    * @{
    */
   typedef PyValue key_type;
-  typedef PyDictValue mapped_type;
+  typedef PyValue mapped_type;
+  typedef PyDictValue reference;
   typedef std::pair<const key_type, mapped_type> value_type;
   typedef PyDictIterator iterator;
   typedef PyDictIterator const_iterator;
@@ -145,12 +170,29 @@ public:
    * @}
    */
 
+  /**
+   * @brief creates a new dict
+   */
   PyDict();
+
+  /**
+   * @brief create a dict from a PyObject
+   * @details does not duplicates PyObject's contents
+   */
   PyDict(PyObject *) throw (std::invalid_argument);
+  PyDict &operator =(PyObject *) throw (std::invalid_argument);
+
+  /**
+   * @brief copy existing PyDict
+   * @details duplicates the PyObject
+   */
   PyDict(const PyDict &);
   PyDict &operator =(const PyDict &);
 
   ~PyDict();
+
+  bool operator ==(const PyDict &) const;
+  bool operator !=(const PyDict &) const;
 
   /**
    * @name capacity related methods
@@ -181,8 +223,8 @@ public:
    * @name element access
    * @{
    */
-  mapped_type operator[] (const key_type &);
-  mapped_type operator[] (const char *);
+  reference operator[] (const key_type &);
+  reference operator[] (const char *);
   /**
    * @}
    */
@@ -196,25 +238,58 @@ public:
   template <class InputIterator>
         void insert(InputIterator first, InputIterator last);
 
-  void erase(iterator &position);
-  size_type erase(const key_type &);
-  void erase(iterator first, iterator last);
-  template <class K>
-    size_type erase(const K&);
+  void erase(iterator &position); //TODO test
+  size_type erase(const key_type &); //TODO test
+  void erase(iterator first, iterator last); //TODO test
 
   // void swap(PyDict<K, V> &); FIXME should be implemented ?
-  void clear();
+  void clear(); //TODO test
   /**
    * @}
    */
 
   /**
    * @name operations
+   * @note @ref iterator returned by @ref find should not be considered as a positional iterator,\n
+   * using operator ++ on it will reset it's value and start an iteration from the beginning of the PyDict.
    * @{
    */
-  iterator find(const key_type &); // TODO
+  iterator find(const key_type &);
   const_iterator find(const key_type &) const; //TODO
-  size_type count(const key_type &) const; //TODO
+  size_type count(const key_type &) const;
+  /**
+   * @}
+   */
+
+  /**
+   * @name templates
+   * @note Convenience template.\n
+   * Might be used with any PyValue convertible type.
+   * @{
+   */
+  template <class K>
+  inline size_type erase(const K &key)
+  {
+    return erase(PyValue(key));
+  }
+
+  template <class K>
+  inline iterator find(const K &key)
+  {
+    return find(PyValue(key));
+  }
+
+  template <class K>
+  inline size_type count(const K &key) const
+  {
+    return count(PyValue(key));
+  }
+
+  template <class K>
+  inline reference operator[] (const K &key)
+  {
+    return operator[](PyValue(key));
+  }
   /**
    * @}
    */
@@ -223,4 +298,3 @@ public:
 #include "PyDict.hxx"
 
 #endif /* PYDICT_HH_ */
-

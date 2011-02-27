@@ -39,6 +39,12 @@ class TestPyDict : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestPyDict);
   CPPUNIT_TEST(test_iter);
   CPPUNIT_TEST(test_create);
+  CPPUNIT_TEST(test_insert);
+  CPPUNIT_TEST(test_find);
+  CPPUNIT_TEST(test_find_iter);
+  CPPUNIT_TEST(test_count);
+  CPPUNIT_TEST(test_copy);
+  CPPUNIT_TEST(test_dictvalue);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -99,6 +105,117 @@ public:
 
     dict.erase("test");
     CPPUNIT_ASSERT(dict.empty());
+  }
+
+  void test_insert() {
+    PyDict dict;
+
+    std::pair<PyDict::iterator, bool> res;
+
+    res = dict.insert(make_pair(PyValue("toto"), PyValue("test")));
+    CPPUNIT_ASSERT(res.first != dict.end());
+    CPPUNIT_ASSERT(res.second == true);
+    CPPUNIT_ASSERT(res.first->first == "toto");
+    CPPUNIT_ASSERT(res.first->second == "test");
+
+    res = dict.insert(make_pair(PyValue("toto"), PyValue("test2")));
+    CPPUNIT_ASSERT(res.first != dict.end());
+    CPPUNIT_ASSERT(res.second == false);
+    CPPUNIT_ASSERT(res.first->second == "test");
+    CPPUNIT_ASSERT(dict["toto"] == "test");
+
+    dict.clear();
+    CPPUNIT_ASSERT(dict.empty());
+
+    PyDict::iterator it = dict.insert(dict.begin(),
+        make_pair(PyValue("toto"), PyValue("test2")));
+    CPPUNIT_ASSERT(it != dict.end());
+    CPPUNIT_ASSERT(it->first == "toto");
+    CPPUNIT_ASSERT(it->second == "test2");
+
+    it = dict.insert(dict.begin(),
+        make_pair(PyValue("toto"), PyValue("test3")));
+    CPPUNIT_ASSERT(it != dict.end());
+    CPPUNIT_ASSERT(it->second == "test2");
+  }
+
+  void test_find() {
+    PyDict dict;
+
+    dict["item1"] = "1";
+    dict["item2"] = "2";
+    dict["item3"] = "3";
+
+    PyDict::iterator it = dict.find("item1");
+    CPPUNIT_ASSERT(it != dict.end());
+    CPPUNIT_ASSERT(it->first == "item1");
+    CPPUNIT_ASSERT(it->second == "1");
+
+    it = dict.find(PyValue("item2"));
+    CPPUNIT_ASSERT(it != dict.end());
+    CPPUNIT_ASSERT(it->first == "item2");
+    CPPUNIT_ASSERT(it->second == "2");
+
+    it = dict.find(PyValue(3));
+    CPPUNIT_ASSERT(it == dict.end());
+  }
+
+  void test_find_iter() {
+    PyDict dict;
+
+    dict["item1"] = "1";
+    dict["item2"] = "2";
+    dict["item3"] = "3";
+
+    PyDict::iterator it = dict.find("item3");
+    CPPUNIT_ASSERT(it != dict.end());
+    CPPUNIT_ASSERT(++it != dict.end());
+    CPPUNIT_ASSERT(it->first == "item2");
+    CPPUNIT_ASSERT((++it)->first == "item3");
+    CPPUNIT_ASSERT((++it)->first == "item1");
+  }
+
+  void test_count() {
+    PyDict dict;
+
+    dict["item1"] = "1";
+    dict[2] = 2;
+
+    CPPUNIT_ASSERT_EQUAL(1, dict.count("item1"));
+    CPPUNIT_ASSERT_EQUAL(1, dict.count(PyValue("item1")));
+    CPPUNIT_ASSERT_EQUAL(0, dict.count("item2"));
+    CPPUNIT_ASSERT_EQUAL(1, dict.count(2));
+    CPPUNIT_ASSERT_EQUAL(0, dict.count("2"));
+  }
+
+  void test_copy() {
+    PyDict dict1, dict2;
+
+    dict2["test"] = 42;
+
+    dict1 = dict2;
+    CPPUNIT_ASSERT(dict1.count("test") == 1);
+    CPPUNIT_ASSERT(dict1 == dict2);
+
+    dict2["test2"] = 43;
+    CPPUNIT_ASSERT(dict1.count("test2") == 0);
+    CPPUNIT_ASSERT(dict1 != dict2);
+
+    dict1["test2"] = dict2["test2"];
+    CPPUNIT_ASSERT(dict1 == dict2);
+
+    dict1["test3"] = dict2["test3"] = 44;
+    CPPUNIT_ASSERT(dict1 == dict2);
+  }
+
+  void test_dictvalue() {
+    /* Testing PyDictValues with no associated dicts */
+    PyDictValue v1;
+    PyDictValue v2(v1);
+
+    v1 = v2;
+    v1 = PyValue(32);
+    v1 = 42;
   }
 };
 

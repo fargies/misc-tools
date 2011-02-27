@@ -31,7 +31,7 @@
 #include "PyDict.hh"
 
 PyDictIterator::PyDictIterator(PyObject *obj) :
-  m_dict(obj), m_pos(0)
+  m_dict(obj)
 {
   if (m_dict) {
     m_pos = 0;
@@ -45,6 +45,17 @@ PyDictIterator::PyDictIterator(PyObject *obj) :
   }
 }
 
+PyDictIterator::PyDictIterator(PyObject *obj, PyObject *key, PyObject *value) :
+    m_dict(obj), m_pos(0)
+{
+  if (!PyDict_Check(obj))
+    throw PyError("Not a PyDict");
+
+  m_value.first = key;
+  m_value.second = PyDictValue(m_dict, key, value);
+  Py_INCREF(m_dict);
+}
+
 PyDictIterator::PyDictIterator(const PyDictIterator &it) :
   m_dict(it.m_dict), m_pos(it.m_pos), m_value(it.m_value)
 {
@@ -56,8 +67,8 @@ PyDictIterator &PyDictIterator::operator = (const PyDictIterator &it)
   if (this != &it) {
     m_pos = it.m_pos;
     m_value = it.m_value;
-    Py_INCREF(it.m_dict);
-    Py_DECREF(m_dict);
+    Py_XINCREF(it.m_dict);
+    Py_XDECREF(m_dict);
     m_dict = it.m_dict;
   }
   return *this;
