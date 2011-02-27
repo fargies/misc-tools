@@ -100,14 +100,14 @@ bool PyDictIterator::operator !=(const PyDictIterator &rhs) const
   return (m_dict != rhs.m_dict) || (m_pos != rhs.m_pos);
 }
 
-PyDictIterator::reference PyDictIterator::operator *()
+PyDictIterator::reference PyDictIterator::operator *() const
 {
-  return m_value;
+  return const_cast<PyDictIterator::reference>(m_value);
 }
 
-PyDictIterator::pointer PyDictIterator::operator ->()
+PyDictIterator::pointer PyDictIterator::operator ->() const
 {
-  return &m_value;
+  return &const_cast<PyDictIterator::reference>(m_value);
 }
 
 void PyDictIterator::getNext()

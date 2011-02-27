@@ -44,6 +44,7 @@ class TestPyDict : public CppUnit::TestFixture
   CPPUNIT_TEST(test_find_iter);
   CPPUNIT_TEST(test_count);
   CPPUNIT_TEST(test_copy);
+  CPPUNIT_TEST(test_erase);
   CPPUNIT_TEST(test_dictvalue);
   CPPUNIT_TEST_SUITE_END();
 
@@ -206,6 +207,34 @@ public:
 
     dict1["test3"] = dict2["test3"] = 44;
     CPPUNIT_ASSERT(dict1 == dict2);
+  }
+
+  void test_erase() {
+    PyDict dict;
+    dict["test1"] = dict["test2"] = "test";
+
+    dict.erase(dict.find("test2"));
+    CPPUNIT_ASSERT(dict.size() == 1);
+
+    CPPUNIT_ASSERT(dict.erase("test1") == 1);
+    CPPUNIT_ASSERT(dict.erase("test1") == 0);
+    CPPUNIT_ASSERT(dict.empty());
+
+    for (int i = 0; i < 100; ++i)
+      dict[i] = i;
+
+    PyDict::iterator er_begin = dict.begin();
+
+    for (int i = 0; i < 10; ++i)
+      ++er_begin;
+
+    PyDict::iterator er_end = er_begin;
+
+    for (int i = 0; i < 20; ++i)
+      ++er_end;
+
+    dict.erase(er_begin, er_end);
+    CPPUNIT_ASSERT(dict.size() == 80);
   }
 
   void test_dictvalue() {

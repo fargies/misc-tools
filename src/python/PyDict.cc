@@ -146,7 +146,7 @@ void PyDict::insert(InputIterator first, InputIterator last)
   }
 }
 
-void PyDict::erase(PyDict::iterator &pos)
+void PyDict::erase(const PyDict::iterator &pos)
 {
   PyDict_DelItem(m_value, pos->first.object());
 }

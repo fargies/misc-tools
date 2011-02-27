@@ -116,8 +116,8 @@ public:
    * @name element access
    * @{
    */
-  reference operator *();
-  pointer operator ->();
+  reference operator *() const;
+  pointer operator ->() const;
   /**
    * @}
    */
@@ -153,6 +153,10 @@ protected:
   friend class PyDict;
 };
 
+/**
+ * @class PyDict
+ * @brief Convenience class to acces Python dicts
+ */
 class PyDict : public PyValue {
 public:
   /**
@@ -191,8 +195,15 @@ public:
 
   ~PyDict();
 
+  /**
+   * @name comparison
+   * @{
+   */
   bool operator ==(const PyDict &) const;
   bool operator !=(const PyDict &) const;
+  /**
+   * @}
+   */
 
   /**
    * @name capacity related methods
@@ -204,7 +215,6 @@ public:
   {
     return size_t(-1) / sizeof(PyObject);
   };
-
   /**
    * @}
    */
@@ -238,12 +248,12 @@ public:
   template <class InputIterator>
         void insert(InputIterator first, InputIterator last);
 
-  void erase(iterator &position); //TODO test
-  size_type erase(const key_type &); //TODO test
+  void erase(const iterator &position); //TODO test
+  size_type erase(const key_type &);
   void erase(iterator first, iterator last); //TODO test
 
   // void swap(PyDict<K, V> &); FIXME should be implemented ?
-  void clear(); //TODO test
+  void clear();
   /**
    * @}
    */

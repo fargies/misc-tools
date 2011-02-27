@@ -34,7 +34,8 @@
 #include "PyError.hh"
 
 /**
- * @class PyValue convenience class to access PyObject
+ * @class PyValue
+ * @brief Convenience class to access PyObject
  */
 class PyValue
 {
