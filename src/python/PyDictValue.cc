@@ -45,8 +45,8 @@ PyDictValue::PyDictValue(PyObject *dict, PyObject *key, PyObject *value) :
 PyDictValue::PyDictValue(const PyDictValue &value) :
   PyValue(value), m_dict(value.m_dict), m_key(value.m_key)
 {
-  Py_INCREF(m_dict);
-  Py_INCREF(m_key);
+  Py_XINCREF(m_dict);
+  Py_XINCREF(m_key);
 }
 
 PyDictValue &PyDictValue::operator = (const PyDictValue &value)
@@ -72,52 +72,4 @@ PyDictValue::~PyDictValue()
 {
   Py_XDECREF(m_dict);
   Py_XDECREF(m_key);
-}
-
-PyDictValue &PyDictValue::operator = (const char *value)
-{
-  if (m_dict && m_key)
-    PyDict_SetItem(m_dict, m_key,
-        PyValue::operator = (value).object());
-  return *this;
-}
-
-PyDictValue &PyDictValue::operator = (const std::string &value)
-{
-  if (m_dict && m_key)
-    PyDict_SetItem(m_dict, m_key,
-        PyValue::operator = (value).object());
-  return *this;
-}
-
-PyDictValue &PyDictValue::operator = (int value)
-{
-  if (m_dict && m_key)
-    PyDict_SetItem(m_dict, m_key,
-        PyValue::operator = (value).object());
-  return *this;
-}
-
-PyDictValue &PyDictValue::operator = (unsigned int value)
-{
-  if (m_dict && m_key)
-    PyDict_SetItem(m_dict, m_key,
-        PyValue::operator = (value).object());
-  return *this;
-}
-
-PyDictValue &PyDictValue::operator = (PyObject *value)
-{
-  if (m_dict && m_key)
-    PyDict_SetItem(m_dict, m_key,
-        PyValue::operator = (value).object());
-  return *this;
-}
-
-PyDictValue &PyDictValue::operator = (const PyValue &value)
-{
-  if (m_dict && m_key)
-    PyDict_SetItem(m_dict, m_key,
-        PyValue::operator = (value).object());
-  return *this;
 }

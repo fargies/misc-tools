@@ -52,12 +52,26 @@ public:
   PyDictValue();
   virtual ~PyDictValue();
 
-  PyDictValue &operator = (const char *);
-  PyDictValue &operator = (const std::string &);
-  PyDictValue &operator = (int);
-  PyDictValue &operator = (unsigned int);
-  PyDictValue &operator = (PyObject *);
-  PyDictValue &operator = (const PyValue &);
+  /**
+   * @name templates
+   * @note Convenience template.\n
+   * Might be used with any PyValue convertible type.
+   * @{
+   */
+  template <typename T>
+  PyDictValue &operator =(const T &value)
+  {
+    if (m_dict && m_key)
+      PyDict_SetItem(m_dict, m_key,
+          PyValue::operator = (value).object());
+    else
+      PyValue::operator = (value);
+    return *this;
+  }
+  /**
+   * @}
+   */
+
 
 protected:
   mutable PyObject *m_dict, *m_key;

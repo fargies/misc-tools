@@ -44,6 +44,7 @@ class TestPyDict : public CppUnit::TestFixture
   CPPUNIT_TEST(test_find_iter);
   CPPUNIT_TEST(test_count);
   CPPUNIT_TEST(test_copy);
+  CPPUNIT_TEST(test_dictvalue);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -205,6 +206,16 @@ public:
 
     dict1["test3"] = dict2["test3"] = 44;
     CPPUNIT_ASSERT(dict1 == dict2);
+  }
+
+  void test_dictvalue() {
+    /* Testing PyDictValues with no associated dicts */
+    PyDictValue v1;
+    PyDictValue v2(v1);
+
+    v1 = v2;
+    v1 = PyValue(32);
+    v1 = 42;
   }
 };
 
