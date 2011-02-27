@@ -181,11 +181,11 @@ public:
     dict["item1"] = "1";
     dict[2] = 2;
 
-    CPPUNIT_ASSERT_EQUAL(1, dict.count("item1"));
-    CPPUNIT_ASSERT_EQUAL(1, dict.count(PyValue("item1")));
-    CPPUNIT_ASSERT_EQUAL(0, dict.count("item2"));
-    CPPUNIT_ASSERT_EQUAL(1, dict.count(2));
-    CPPUNIT_ASSERT_EQUAL(0, dict.count("2"));
+    CPPUNIT_ASSERT_EQUAL((PyDict::size_type) 1, dict.count("item1"));
+    CPPUNIT_ASSERT_EQUAL((PyDict::size_type) 1, dict.count(PyValue("item1")));
+    CPPUNIT_ASSERT_EQUAL((PyDict::size_type) 0, dict.count("item2"));
+    CPPUNIT_ASSERT_EQUAL((PyDict::size_type) 1, dict.count(2));
+    CPPUNIT_ASSERT_EQUAL((PyDict::size_type) 0, dict.count("2"));
   }
 
   void test_copy() {
