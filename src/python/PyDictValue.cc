@@ -42,6 +42,34 @@ PyDictValue::PyDictValue(PyObject *dict, PyObject *key, PyObject *value) :
   Py_INCREF(key);
 }
 
+PyDictValue &PyDictValue::reseat(const PyDictValue &value)
+{
+  return reseat(value.m_dict, value.m_key, value.m_value);
+}
+
+PyDictValue &PyDictValue::reseat(PyObject *dict, PyObject *key, PyObject *value)
+{
+  Py_XINCREF(dict);
+  Py_XINCREF(key);
+  Py_XDECREF(m_dict);
+  Py_XDECREF(m_key);
+
+  m_dict = dict;
+  m_key = key;
+
+  if (value == NULL && dict != NULL && key != NULL) {
+    value = PyDict_GetItem(dict, key);
+    if (value)
+      PyValue::operator = (value);
+    else
+      PyDict_SetItem(dict, key, Py_None);
+  }
+  else
+    PyValue::operator = (value);
+
+  return *this;
+}
+
 PyDictValue::PyDictValue(const PyDictValue &value) :
   PyValue(value), m_dict(value.m_dict), m_key(value.m_key)
 {
@@ -52,13 +80,14 @@ PyDictValue::PyDictValue(const PyDictValue &value) :
 PyDictValue &PyDictValue::operator = (const PyDictValue &value)
 {
   if (this != &value) {
+    operator = (value.object());
+
     if (!m_dict && !m_key) {
         Py_XINCREF(value.m_dict);
         Py_XINCREF(value.m_key);
         m_dict = value.m_dict;
         m_key = value.m_key;
     }
-    operator = (value.object());
   }
   return *this;
 }
@@ -73,3 +102,4 @@ PyDictValue::~PyDictValue()
   Py_XDECREF(m_dict);
   Py_XDECREF(m_key);
 }
+

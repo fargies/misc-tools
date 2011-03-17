@@ -76,6 +76,8 @@ public:
       CPPUNIT_ASSERT("textValue2" == (it++)->second);
       CPPUNIT_ASSERT("textValue" == (it++)->second);
       CPPUNIT_ASSERT(dict.end() == it);
+
+      CPPUNIT_ASSERT(dict.begin()->second == 2);
     }
 
     CPPUNIT_ASSERT_EQUAL((Py_ssize_t) 1, obj->ob_refcnt);

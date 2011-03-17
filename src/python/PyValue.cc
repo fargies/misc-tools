@@ -107,7 +107,10 @@ PyValue &PyValue::operator = (unsigned int i)
 
 PyValue &PyValue::operator = (PyObject *obj)
 {
-  Py_XINCREF(obj);
+  if (obj == NULL)
+    obj = Py_None;
+
+  Py_INCREF(obj);
   Py_XDECREF(m_value);
   m_value = obj;
   return *this;

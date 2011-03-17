@@ -136,16 +136,6 @@ PyDict::iterator PyDict::insert(PyDict::iterator pos,
   }
 }
 
-template <class InputIterator>
-void PyDict::insert(InputIterator first, InputIterator last)
-{
-  PyDict::iterator it = this->begin();
-  while (first != last) {
-    it = insert(it, *first);
-    ++first;
-  }
-}
-
 void PyDict::erase(const PyDict::iterator &pos)
 {
   PyDict_DelItem(m_value, pos->first.object());

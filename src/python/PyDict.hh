@@ -42,11 +42,6 @@
 class PyDictValue : public PyValue
 {
 public:
-  /**
-   * @details when value is NULL,  PyDict_GetItem is used to find out the real value
-   * @details creates a Py_None value in the dict if the given key is not found
-   */
-  PyDictValue(PyObject *dict, PyObject *key, PyObject *value = NULL);
   PyDictValue(const PyDictValue &);
   PyDictValue &operator = (const PyDictValue &);
   PyDictValue();
@@ -72,9 +67,19 @@ public:
    * @}
    */
 
-
 protected:
+  /**
+   * @details when value is NULL,  PyDict_GetItem is used to find out the real value
+   * @details creates a Py_None value in the dict if the given key is not found
+   */
+  PyDictValue(PyObject *dict, PyObject *key, PyObject *value = NULL);
+  PyDictValue &reseat(PyObject *dict, PyObject *key, PyObject *value = NULL);
+  PyDictValue &reseat(const PyDictValue &value);
+
   mutable PyObject *m_dict, *m_key;
+
+  friend class PyDictIterator;
+  friend class PyDict;
 };
 
 class PyDictIterator :
@@ -245,8 +250,6 @@ public:
    */
   std::pair<iterator, bool> insert(const value_type &);
   iterator insert(iterator position, const value_type &);
-  template <class InputIterator>
-        void insert(InputIterator first, InputIterator last);
 
   void erase(const iterator &position); //TODO test
   size_type erase(const key_type &);
@@ -299,6 +302,16 @@ public:
   inline reference operator[] (const K &key)
   {
     return operator[](PyValue(key));
+  }
+
+  template <class InputIterator>
+  inline void insert(InputIterator first, InputIterator last)
+  {
+    PyDict::iterator it = this->begin();
+    while (first != last) {
+      it = insert(it, *first);
+      ++first;
+    }
   }
   /**
    * @}
