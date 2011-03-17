@@ -39,7 +39,6 @@ PySeqValue::PySeqValue(PyObject *seq, Py_ssize_t index, PyObject *value) :
   }
   else
     PyValue::operator = (value);
-  Py_INCREF(seq);
 }
 
 PySeqValue &PySeqValue::reseat(const PySeqValue &value)
@@ -49,8 +48,6 @@ PySeqValue &PySeqValue::reseat(const PySeqValue &value)
 
 PySeqValue &PySeqValue::reseat(PyObject *seq, Py_ssize_t index, PyObject *value)
 {
-  Py_XINCREF(seq);
-  Py_XDECREF(m_seq);
   m_pos = index;
   m_seq = seq;
 
@@ -71,7 +68,6 @@ PySeqValue &PySeqValue::reseat(PyObject *seq, Py_ssize_t index, PyObject *value)
 PySeqValue::PySeqValue(const PySeqValue &value) :
   PyValue(value), m_seq(value.m_seq)
 {
-  Py_XINCREF(m_seq);
 }
 
 PySeqValue &PySeqValue::operator = (const PySeqValue &value)
@@ -80,7 +76,6 @@ PySeqValue &PySeqValue::operator = (const PySeqValue &value)
     operator = (value.object());
 
     if (m_seq == NULL) {
-      Py_XINCREF(value.m_seq);
       m_seq = value.m_seq;
       m_pos = value.m_pos;
     }
@@ -95,6 +90,5 @@ PySeqValue::PySeqValue() :
 
 PySeqValue::~PySeqValue()
 {
-  Py_XDECREF(m_seq);
 }
 

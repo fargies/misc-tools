@@ -26,14 +26,13 @@
 
 #include "PySeq.hh"
 
-PySeqIterator::PySeqIterator(PyObject *obj) :
-  m_seq(obj)
+PySeqIterator::PySeqIterator(PyObject *seq) :
+  m_seq(seq)
 {
-  if (m_seq) {
+  if (m_seq != NULL) {
     m_pos = -1;
-    if (!PySequence_Check(obj))
+    if (!PySequence_Check(seq))
       throw PyError("Not a PySequence");
-    Py_INCREF(m_seq);
     getNext();
   }
   else {
@@ -44,30 +43,25 @@ PySeqIterator::PySeqIterator(PyObject *obj) :
 PySeqIterator::PySeqIterator(PyObject *obj, Py_ssize_t index, PyObject *value) :
   m_seq(obj), m_pos(index), m_value(obj, index, value)
 {
-  Py_INCREF(m_seq);
 }
 
 PySeqIterator::PySeqIterator(const PySeqIterator &it) :
   m_seq(it.m_seq), m_pos(it.m_pos), m_value(it.m_value)
 {
-  Py_XINCREF(m_seq);
 }
 
 PySeqIterator &PySeqIterator::operator = (const PySeqIterator &it)
 {
   if (this != &it) {
     m_pos = it.m_pos;
-    m_value.reseat(it.m_value);
-    Py_XINCREF(it.m_seq);
-    Py_XDECREF(m_seq);
     m_seq = it.m_seq;
+    m_value.reseat(it.m_value);
   }
   return *this;
 }
 
 PySeqIterator::~PySeqIterator()
 {
-  Py_XDECREF(m_seq);
 }
 
 PySeqIterator &PySeqIterator::operator ++()
@@ -137,7 +131,6 @@ void PySeqIterator::clear()
 {
   m_pos = -1;
   m_value.reseat(NULL, NULL, NULL);
-  Py_XDECREF(m_seq);
   m_seq = NULL;
 }
 

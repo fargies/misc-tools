@@ -37,7 +37,6 @@ PyDictIterator::PyDictIterator(PyObject *obj) :
     m_pos = 0;
     if (!PyDict_Check(obj))
       throw PyError("Not a PyDict");
-    Py_INCREF(m_dict);
     getNext();
   }
   else {
@@ -53,21 +52,17 @@ PyDictIterator::PyDictIterator(PyObject *obj, PyObject *key, PyObject *value) :
 
   m_value.first = key;
   m_value.second.reseat(m_dict, key, value);
-  Py_INCREF(m_dict);
 }
 
 PyDictIterator::PyDictIterator(const PyDictIterator &it) :
   m_dict(it.m_dict), m_pos(it.m_pos), m_value(it.m_value)
 {
-  Py_XINCREF(m_dict);
 }
 
 PyDictIterator &PyDictIterator::operator = (const PyDictIterator &it)
 {
   if (this != &it) {
     m_pos = it.m_pos;
-    Py_XINCREF(it.m_dict);
-    Py_XDECREF(m_dict);
     m_dict = it.m_dict;
     m_value.first = it.m_value.first;
     m_value.second.reseat(it.m_value.second);
@@ -77,7 +72,6 @@ PyDictIterator &PyDictIterator::operator = (const PyDictIterator &it)
 
 PyDictIterator::~PyDictIterator()
 {
-  Py_XDECREF(m_dict);
 }
 
 PyDictIterator &PyDictIterator::operator ++() {
@@ -126,10 +120,7 @@ void PyDictIterator::getNext()
 
 void PyDictIterator::clear()
 {
-  if (m_dict) {
-    Py_DECREF(m_dict);
-    m_dict = NULL;
-  }
+  m_dict = NULL;
   m_pos = -1;
   m_value.first = Py_None;
   m_value.second.reseat(NULL, NULL, NULL);
