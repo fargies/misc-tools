@@ -99,7 +99,7 @@ public:
   }
 
   void test_copy() {
-/*    PyList list1, list2;
+    PyList list1, list2;
 
     list2.push_back(42);
 
@@ -115,7 +115,7 @@ public:
     CPPUNIT_ASSERT(list1 == list2);
 
     list1.front() = list2.front() = 72;
-    CPPUNIT_ASSERT(list1 == list2);*/
+    CPPUNIT_ASSERT(list1 == list2);
   }
 
   void test_map() {

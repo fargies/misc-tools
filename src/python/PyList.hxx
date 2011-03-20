@@ -80,6 +80,20 @@ PyListBase<V>::~PyListBase()
 }
 
 template <typename V>
+template <typename K>
+bool PyListBase<V>::operator ==(const PyListBase<K> &list) const
+{
+  return PySeqBase<V>::operator == (list);
+}
+
+template <typename V>
+template <typename K>
+bool PyListBase<V>::operator !=(const PyListBase<K> &list) const
+{
+  return PySeqBase<V>::operator != (list);
+}
+
+template <typename V>
 void PyListBase<V>::assign(size_type n, const value_type &u)
 {
   PyObject *obj = PyList_New(n);

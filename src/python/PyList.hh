@@ -64,6 +64,18 @@ public:
   ~PyListBase();
 
   /**
+   * @name comparison
+   */
+  template <typename K>
+  bool operator ==(const PyListBase<K> &) const;
+
+  template <typename K>
+  bool operator !=(const PyListBase<K> &) const;
+  /**
+   * @}
+   */
+
+  /**
    * @name modifiers
    * @{
    */
