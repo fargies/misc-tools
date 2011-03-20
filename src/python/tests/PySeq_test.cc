@@ -173,8 +173,8 @@ protected:
 
   void test_seqvalue() {
     /* Testing PySeqValues with no associated seq */
-    PySeqValue v1;
-    PySeqValue v2(v1);
+    PySeqValue<PyValue> v1;
+    PySeqValue<PyValue> v2(v1);
 
     v1 = v2;
     v1 = PyValue(32);

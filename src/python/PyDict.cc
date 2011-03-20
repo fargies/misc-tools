@@ -50,7 +50,7 @@ PyDict &PyDict::operator =(const PyDict &dict)
 
 PyDict::PyDict(PyObject *obj) throw (std::invalid_argument)
 {
-  if (!PyDict_Check(obj))
+  if (obj && !PyDict_Check(obj))
     throw std::invalid_argument("Not a PyDict");
   PyValue::operator = (obj);
 }
@@ -58,7 +58,7 @@ PyDict::PyDict(PyObject *obj) throw (std::invalid_argument)
 PyDict &PyDict::operator =(PyObject *obj) throw (std::invalid_argument)
 {
   if (this->object() != obj) {
-    if (!PyDict_Check(obj))
+    if (obj && !PyDict_Check(obj))
       throw std::invalid_argument("Not a PyDict");
     PyValue::operator = (obj);
   }

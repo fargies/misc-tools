@@ -35,8 +35,9 @@
 #include "PyError.hh"
 #include "PyValue.hh"
 
+template <typename V>
 class PySeqValue :
-  public PyValue
+  public V
 {
 public:
   PySeqValue(const PySeqValue &);
@@ -74,19 +75,22 @@ protected:
   PySeqValue &reseat(PyObject *seq, Py_ssize_t index, PyObject *value = NULL);
   PySeqValue &reseat(const PySeqValue &value);
 
-  friend class PySeq;
-  friend class PySeqIterator;
+  template <typename T> friend class PySeqBase; //FIXME
+  template <typename T> friend class PySeqIterator;
 };
 
+#include "PySeqValue.hxx"
+
+template <typename V>
 class PySeqIterator :
-  public std::iterator<std::input_iterator_tag, PySeqValue>
+  public std::iterator<std::input_iterator_tag, PySeqValue<V> >
 {
 public:
   /**
    * @name typedefs
    * @{
    */
-  typedef PySeqValue value_type;
+  typedef PySeqValue<V> value_type;
   typedef value_type & reference;
   typedef value_type * pointer;
   /**
@@ -163,24 +167,27 @@ protected:
   /**
    * @details PyList::insert uses protected constructor
    */
-  friend class PyList;
+  template <typename T> friend class PyListBase;
 };
 
+#include "PySeqIterator.hxx"
+
 /**
- * @class PySeq
+ * @class PySeqBase
  * @brief Convenience class to access Python Lists
  */
-class PySeq : public PyValue {
+template <typename V>
+class PySeqBase : public PyValue {
 public:
   /**
    * @name typedefs
    * @{
    */
-  typedef PyValue value_type;
-  typedef PySeqValue reference;
-  typedef const PySeqValue const_reference;
-  typedef PySeqIterator iterator;
-  typedef PySeqIterator const_iterator;
+  typedef V value_type;
+  typedef PySeqValue<V> reference;
+  typedef const PySeqValue<V> const_reference;
+  typedef PySeqIterator<V> iterator;
+  typedef PySeqIterator<V> const_iterator;
   typedef size_t size_type;
   /**
    * @}
@@ -190,17 +197,17 @@ public:
    * @brief create a list from a PyObject
    * @details does not duplicates PyObject's contents
    */
-  PySeq(PyObject *) throw (std::invalid_argument);
-  PySeq &operator =(PyObject *) throw (std::invalid_argument);
+  PySeqBase(PyObject *) throw (std::invalid_argument);
+  PySeqBase &operator =(PyObject *) throw (std::invalid_argument);
 
-  ~PySeq();
+  ~PySeqBase();
 
   /**
    * @name comparison
    * @{
    */
-  bool operator ==(const PySeq &) const;
-  bool operator !=(const PySeq &) const;
+  bool operator ==(const PySeqBase<V> &) const;
+  bool operator !=(const PySeqBase<V> &) const;
   /**
    * @}
    */
@@ -274,9 +281,16 @@ protected:
    * @details duplicates the PyObject
    * @warning set protected, deepcopy might be used
    */
-  PySeq(const PySeq &);
-  PySeq &operator =(const PySeq &);
+  PySeqBase(const PySeqBase<V> &);
+  PySeqBase<V> &operator =(const PySeqBase<V> &);
 };
+
+#include "PySeq.hxx"
+
+/**
+ * @brief default Sequence type
+ */
+typedef PySeqBase<PyValue> PySeq;
 
 #endif /* PYSEQ_HH_ */
 

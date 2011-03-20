@@ -31,6 +31,7 @@
 #include <string>
 
 #include "PyList.hh"
+#include "PyDict.hh"
 
 using namespace std;
 
@@ -40,7 +41,7 @@ class TestPyList : public CppUnit::TestFixture
   CPPUNIT_TEST(test_create);
   CPPUNIT_TEST(test_insert);
   CPPUNIT_TEST(test_copy);
-  CPPUNIT_TEST(test_erase);
+  CPPUNIT_TEST(test_map);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -98,55 +99,51 @@ public:
   }
 
   void test_copy() {
-/*    PyList dict1, dict2;
+/*    PyList list1, list2;
 
-    dict2["test"] = 42;
+    list2.push_back(42);
 
-    dict1 = dict2;
-    CPPUNIT_ASSERT(dict1.count("test") == 1);
-    CPPUNIT_ASSERT(dict1 == dict2);
+    list1 = list2;
+    CPPUNIT_ASSERT(list1.size() == 1);
+    CPPUNIT_ASSERT(list1 == list2);
 
-    dict2["test2"] = 43;
-    CPPUNIT_ASSERT(dict1.count("test2") == 0);
-    CPPUNIT_ASSERT(dict1 != dict2);
+    list2.push_back(43);
+    CPPUNIT_ASSERT(list1.size() == 1);
+    CPPUNIT_ASSERT(list1 != list2);
 
-    dict1["test2"] = dict2["test2"];
-    CPPUNIT_ASSERT(dict1 == dict2);
+    list1.push_back(43);
+    CPPUNIT_ASSERT(list1 == list2);
 
-    dict1["test3"] = dict2["test3"] = 44;
-    CPPUNIT_ASSERT(dict1 == dict2);*/
+    list1.front() = list2.front() = 72;
+    CPPUNIT_ASSERT(list1 == list2);*/
   }
 
-  void test_erase() {
-/*    PyList dict;
-    dict["test1"] = dict["test2"] = "test";
+  void test_map() {
+    typedef PyListBase<PyDict> PyDictList;
+    PyDictList list;
 
-    dict.erase(dict.find("test2"));
-    CPPUNIT_ASSERT(dict.size() == 1);
+    list.push_back(PyDictList::value_type());
 
-    CPPUNIT_ASSERT(dict.erase("test1") == 1);
-    CPPUNIT_ASSERT(dict.erase("test1") == 0);
-    CPPUNIT_ASSERT(dict.empty());
+    CPPUNIT_ASSERT_EQUAL((PyDictList::size_type) 1, list.size());
 
-    for (int i = 0; i < 100; ++i)
-      dict[i] = i;
+    list.front()["test"] = 42;
 
-    PyList::iterator er_begin = dict.begin();
+    PyDictList::reference ref = list.front();
+    ref["test2"] = "test2_value";
 
-    for (int i = 0; i < 10; ++i)
-      ++er_begin;
+    CPPUNIT_ASSERT_EQUAL((PyDict::size_type) 2, list.front().size());
 
-    PyList::iterator er_end = er_begin;
+    list.push_front(list.front());
+    CPPUNIT_ASSERT(list.size() == 2);
+    list.front()["test3"] = "test3_value";
 
-    for (int i = 0; i < 20; ++i)
-      ++er_end;
-
-    dict.erase(er_begin, er_end);
-    CPPUNIT_ASSERT(dict.size() == 80);*/
+    CPPUNIT_ASSERT_EQUAL((PyDict::size_type) 2, list.back().size());
+    for (PyDictList::iterator it = list.begin();
+         it != list.end(); ++it)
+      ;
+    list.clear();
   }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestPyList);
-
-
 

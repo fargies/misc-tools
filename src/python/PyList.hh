@@ -29,36 +29,45 @@
 
 #include "PySeq.hh"
 
-class PyList :
-  public PySeq
+template <typename V>
+class PyListBase :
+  public PySeqBase<V>
 {
 public:
+  typedef typename PySeqBase<V>::value_type value_type;
+  typedef typename PySeqBase<V>::reference reference;
+  typedef typename PySeqBase<V>::const_reference const_reference;
+  typedef typename PySeqBase<V>::iterator iterator;
+  typedef typename PySeqBase<V>::const_iterator const_iterator;
+  typedef typename PySeqBase<V>::size_type size_type;
+
+
   /**
    * @brief create a list from a PyObject
    * @details does not duplicates PyObject's contents
    */
-  PyList(PyObject *) throw (std::invalid_argument);
-  PyList &operator = (PyObject *) throw (std::invalid_argument);
+  PyListBase(PyObject *) throw (std::invalid_argument);
+  PyListBase &operator = (PyObject *) throw (std::invalid_argument);
 
   /**
-   * @brief copy an existing PyList
+   * @brief copy an existing PyListBase
    * @details duplicates the PyObject
    */
-  PyList(const PyList &list);
-  PyList &operator = (const PyList &list);
+  PyListBase(const PyListBase<V> &list);
+  PyListBase &operator = (const PyListBase<V> &list);
 
   /**
    * @brief create a new list
    */
-  PyList();
+  PyListBase();
 
-  ~PyList();
+  ~PyListBase();
 
   /**
    * @name modifiers
    * @{
    */
-  void assign(size_type n, const value_type &u = PyValue());
+  void assign(size_type n, const value_type &u = V());
   void push_front(const value_type &);
   void push_back(const value_type &);
   iterator insert(iterator position, const value_type &);
@@ -70,37 +79,37 @@ public:
   /**
    * @name templates
    * @note Convenience template.\n
-   * Might be used with any PyValue convertible type.
+   * Might be used with any V convertible type.
    * @{
    */
   template <class K>
   inline void assign(size_type n, const K &val)
   {
-    assign(n, PyValue(val));
+    assign(n, V(val));
   }
 
   template <class K>
   inline void push_front(const K &val)
   {
-    push_front(PyValue(val));
+    push_front(V(val));
   }
 
   template <class K>
   inline void push_back(const K &val)
   {
-    push_back(PyValue(val));
+    push_back(V(val));
   }
 
   template <class K>
   inline iterator insert(iterator position, const K &val)
   {
-    return insert(position, PyValue(val));
+    return insert(position, V(val));
   }
 
   template <class K>
   inline void insert(iterator position, size_type n, const K &val)
   {
-    insert(position, n, PyValue(val));
+    insert(position, n, V(val));
   }
 /*  template <class InputIterator>
   inline void assign(InputIterator first, InputIterator last)
@@ -119,9 +128,11 @@ public:
   /**
    * @}
    */
-
-
 };
+
+#include "PyList.hxx"
+
+typedef PyListBase<PyValue> PyList;
 
 #endif
 
