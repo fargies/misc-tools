@@ -1,0 +1,4 @@
+
+let g:build_dir='build'
+let $CTEST_OUTPUT_ON_FAILURE=1
+
