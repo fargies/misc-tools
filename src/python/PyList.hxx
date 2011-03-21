@@ -121,11 +121,11 @@ typename PyListBase<V>::iterator PyListBase<V>::insert(iterator position, const 
 {
   if (position.pos() == -1) {
     PyList_Append(this->m_value, val.object());
-    return PyListBase<V>::iterator(this->m_value, this->size() - 1, val.object());
+    return typename PyListBase<V>::iterator(this->m_value, this->size() - 1, val.object());
   }
   else {
     PyList_Insert(this->m_value, position.pos(), val.object());
-    return PyListBase<V>::iterator(this->m_value, position.pos(), val.object());
+    return typename PyListBase<V>::iterator(this->m_value, position.pos(), val.object());
   }
 }
 

@@ -154,13 +154,13 @@ void PySeqIterator<V>::clear()
 template <typename V>
 typename PySeqIterator<V>::reference PySeqIterator<V>::operator *() const
 {
-  return const_cast<PySeqIterator<V>::reference>(m_value);
+  return const_cast<typename PySeqIterator<V>::reference>(m_value);
 }
 
 template <typename V>
 typename PySeqIterator<V>::pointer PySeqIterator<V>::operator ->() const
 {
-  return &const_cast<PySeqIterator<V>::reference>(m_value);
+  return &const_cast<typename PySeqIterator<V>::reference>(m_value);
 }
 
 #endif

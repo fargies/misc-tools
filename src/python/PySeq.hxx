@@ -95,13 +95,13 @@ void PySeqBase<T>::resize(size_type n, const value_type &val)
 template <typename T>
 typename PySeqBase<T>::iterator PySeqBase<T>::begin()
 {
-  return PySeqBase<T>::iterator(m_value);
+  return typename PySeqBase<T>::iterator(m_value);
 }
 
 template <typename T>
 typename PySeqBase<T>::iterator PySeqBase<T>::end()
 {
-  return PySeqBase<T>::iterator();
+  return typename PySeqBase<T>::iterator();
 }
 
 template <typename T>
