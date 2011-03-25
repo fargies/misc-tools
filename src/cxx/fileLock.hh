@@ -24,6 +24,9 @@
 **
 */
 
+#ifndef __FILELOCK_HH__
+#define __FILELOCK_HH__
+
 class FileLock {
 public:
 
@@ -47,4 +50,6 @@ protected:
 
   FileLock(const FileLock &);
 };
+
+#endif
 
