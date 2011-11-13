@@ -24,7 +24,7 @@ endif (NOT DBUS_XML2CPP)
 #                   DEPENDS variant_dbus_introspect.xml)  
 
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/../variant)
-include_directories(${CMAKE_CURRENT_BINARY_DIR} ../variant ${DBUS_CPP_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR} ../variant ${DBUS_CPP_INCLUDE_DIRS})
 add_executable(variant_dbus_bench
                variant_dbus_proxy.hh
                variant_dbus_adaptor.hh

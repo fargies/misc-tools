@@ -24,10 +24,11 @@
 **
 */
 
-
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
 #include <iostream>
+#include <fstream>
+#include <unistd.h>
 
 #include "expat++.hh"
 
@@ -74,7 +75,27 @@ class TestExpat : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  void test_parser() {
+  void setUp()
+  {
+      std::ofstream sample("sample.xml", std::ios::out | std::ios::trunc);
+      sample << "<?xml version=\"1.0\"?>"
+          "<test name=\"pwet\">"
+          "<item/>"
+          "<item> sample data in item </item>"
+          "<item myattr=\"samplevalue\"> sample data in item </item>"
+          "</test>";
+      sample.close();
+      CPPUNIT_ASSERT(!sample.fail());
+  }
+
+  void tearDown()
+  {
+      CPPUNIT_ASSERT_EQUAL(0, unlink("sample.xml"));
+  }
+
+protected:
+  void test_parser()
+  {
     ExpatTester tester;
 
     CPPUNIT_ASSERT_EQUAL(0, tester.parseFile("sample.xml"));

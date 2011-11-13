@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<test name="pwet">
-  <item/>
-  <item> sample data in item </item>
-  <item myattr="samplevalue"> sample data in item </item>
-</test>
-
