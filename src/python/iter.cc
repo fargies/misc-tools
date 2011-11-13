@@ -20,7 +20,6 @@
 ** iter.cc
 **
 **        Created on: Wed 02 Feb 2011 11:12:14 PM CET
-** Last modification: Thu 10 Feb 2011 01:03:40 AM CET
 **            Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
@@ -135,8 +134,6 @@ printf("iter : %s\n", obj->ob_type->tp_name);
   iter = PyObject_GetIter(items);
 
   while (item = PyIter_Next(iter)) {
-    printf("item: %s\n", item->ob_type->tp_name);
-    printf("refcnt: %i\n", item->ob_refcnt);
 
     PyObject *item2 = PyTuple_GetItem(item, 1);
     //PyTuple_SetItem(item, 1, PyString_FromString("pwet"));
