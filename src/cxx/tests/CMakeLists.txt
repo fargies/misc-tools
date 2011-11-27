@@ -9,20 +9,14 @@ pkg_check_modules(CPPUNIT cppunit)
 add_library(testHelper SHARED test_main.cc)
 target_link_libraries(testHelper ${CPPUNIT_LIBRARIES})
 
-add_executable(chrono_test chrono_test.cc)
-target_link_libraries(chrono_test testHelper chrono)
+set(test_SRCS
+    chrono_test.cc
+    sem_test.cc
+    fileLock_test.cc
+    iterator_test.cc)
 
-add_executable(fileLock_test fileLock_test.cc)
-target_link_libraries(fileLock_test testHelper sem fileLock)
+add_executable(test_all ${test_SRCS})
+target_link_libraries(test_all testHelper cxx-misc-tools)
 
-add_executable(sem_test sem_test.cc)
-target_link_libraries(sem_test testHelper sem)
-
-add_executable(iterator_test iterator_test.cc)
-target_link_libraries(iterator_test testHelper)
-
-add_test(chrono_test ${CMAKE_CURRENT_BINARY_DIR}/chrono_test)
-add_test(fileLock_test ${CMAKE_CURRENT_BINARY_DIR}/fileLock_test)
-add_test(sem_test ${CMAKE_CURRENT_BINARY_DIR}/sem_test)
-add_test(iterator_test ${CMAKE_CURRENT_BINARY_DIR}/iterator_test)
+add_test(test_all ${CMAKE_CURRENT_BINARY_DIR}/test_all)
 

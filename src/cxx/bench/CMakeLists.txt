@@ -4,10 +4,10 @@ link_directories(${CMAKE_CURRENT_BINARY_DIR}/../sem)
 include_directories(.. ../sem)
 
 add_executable(rwLock_bench rwLock_bench.cc)
-target_link_libraries(rwLock_bench testHelper rwLock chrono)
+target_link_libraries(rwLock_bench testHelper cxx-misc-tools)
 
 add_executable(fileLock_bench fileLock_bench.cc)
-target_link_libraries(fileLock_bench testHelper fileLock chrono)
+target_link_libraries(fileLock_bench testHelper cxx-misc-tools)
 
 if (DBUS_CPP_FOUND)
 
@@ -29,6 +29,6 @@ add_executable(variant_dbus_bench
                variant_dbus_proxy.hh
                variant_dbus_adaptor.hh
                variant_dbus_bench.cc)
-target_link_libraries(variant_dbus_bench testHelper Variant chrono)
+target_link_libraries(variant_dbus_bench testHelper cxx-misc-tools)
 
 endif (DBUS_CPP_FOUND)
