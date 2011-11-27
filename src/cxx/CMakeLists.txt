@@ -8,10 +8,11 @@ target_link_libraries(cxx-misc-tools
     python++)
 
 add_subdirectory(sem)
-add_subdirectory(tests)
 add_subdirectory(bench)
 add_subdirectory(variant)
 add_subdirectory(threading)
 add_subdirectory(expat)
 add_subdirectory(python)
+
+add_subdirectory(tests)
 
