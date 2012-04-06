@@ -58,6 +58,10 @@ public:
   void addDataWatch(std::string *accu);
   void removeDataWatch();
 
+  void setHandlers(Handler start, Handler end);
+  void setStartHandler(Handler start);
+  void setEndHandler(Handler end);
+
   /**
    * @brief returns current item attributes
    * @details must be used only in startHandler
@@ -82,7 +86,7 @@ protected:
    */
   Handler end;
 
-  template <class P> friend void __startHdlr(void *, const XML_Char *, const XML_Char **);
+  template<class P> friend void __startHdlr(void *, const XML_Char *, const XML_Char **);
   template<class P> friend void __endHdlr(void *, const XML_Char *);
   template<class P> friend void __dataHdlr(void *, const XML_Char *, int);
 };
