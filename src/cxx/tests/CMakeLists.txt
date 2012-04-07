@@ -25,5 +25,7 @@ if(EXPAT)
     target_link_libraries(test_all expat++-tests)
 endif(EXPAT)
 
+target_link_libraries(test_all threading-tests)
+
 add_test(test_all ${CMAKE_CURRENT_BINARY_DIR}/test_all)
 

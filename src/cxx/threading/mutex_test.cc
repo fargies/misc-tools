@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,41 +17,41 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** mutex.hh
+** mutex_test.cc
 **
-**        Created on: Nov 13, 2011
+**        Created on: Apr 07, 2012
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __MUTEX_HH__
-#define __MUTEX_HH__
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/TestFixture.h>
 
-#include <pthread.h>
+#include "mutex.hh"
 
-#ifdef NDEBUG
-#define DEFAULT_MUTEX_TYPE PTHREAD_MUTEX_DEFAULT
-#else
-#define DEFAULT_MUTEX_TYPE PTHREAD_MUTEX_ERRORCHECK
-#endif
-
-class Mutex
+class TestMutex : public CppUnit::TestFixture
 {
+    CPPUNIT_TEST_SUITE(TestMutex);
+    CPPUNIT_TEST(simple);
+    CPPUNIT_TEST_SUITE_END();
+
 public:
-    Mutex(int type = DEFAULT_MUTEX_TYPE);
-    ~Mutex();
+    void simple()
+    {
+        Mutex m;
 
-    void lock();
-    bool trylock();
-    void unlock();
+        CPPUNIT_ASSERT(m.trylock());
 
-protected:
-    pthread_mutex_t m_mutex;
+        CPPUNIT_ASSERT(!m.trylock());
 
-private:
-    Mutex(const Mutex &);
-    Mutex &operator =(const Mutex &);
+        m.unlock();
+
+        m.lock();
+
+        CPPUNIT_ASSERT(!m.trylock());
+
+        m.unlock();
+    }
 };
 
-#endif
-
+CPPUNIT_TEST_SUITE_REGISTRATION(TestMutex);
