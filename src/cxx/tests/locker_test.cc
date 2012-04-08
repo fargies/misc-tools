@@ -17,23 +17,24 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** mutex_test.cc
+** locker_test.cc
 **
-**        Created on: Apr 07, 2012
+**        Created on: Apr 08, 2012
 **   Original Author: fargie_s
 **
 */
+
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
 
 #include "threading/mutex.hh"
+#include "threading/locker.hh"
 
-class TestMutex : public CppUnit::TestFixture
+class TestLocker : public CppUnit::TestFixture
 {
-    CPPUNIT_TEST_SUITE(TestMutex);
+    CPPUNIT_TEST_SUITE(TestLocker);
     CPPUNIT_TEST(simple);
-    CPPUNIT_TEST(recursive);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -41,28 +42,15 @@ public:
     {
         Mutex m;
 
+        {
+            Locker l(m);
+
+            CPPUNIT_ASSERT(!m.trylock());
+        }
         CPPUNIT_ASSERT(m.trylock());
-
-        CPPUNIT_ASSERT(!m.trylock());
-
-        m.unlock();
-
-        m.lock();
-
-        CPPUNIT_ASSERT(!m.trylock());
-
         m.unlock();
     }
 
-    void recursive()
-    {
-        Mutex m(PTHREAD_MUTEX_RECURSIVE);
-
-        CPPUNIT_ASSERT(m.trylock());
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-        m.unlock();
-    }
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestMutex);
+CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);

@@ -37,7 +37,7 @@
 #define CHECK_EQ0(cmd) { \
     int rc = (cmd); \
     if (rc != 0) { \
-        fprintf(stderr, "%s:%i cmd:%s failed rc:%i:%s", \
+        fprintf(stderr, "%s:%i cmd:%s failed rc:%i:%s\n", \
                 __FILE__, __LINE__, #cmd, rc, strerror(rc)); \
         assert(0); \
     } \
