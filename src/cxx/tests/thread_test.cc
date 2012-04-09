@@ -17,39 +17,58 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** thread_test.cc
 **
-**        Created on: Apr 08, 2012
+**        Created on: Apr 09, 2012
 **   Original Author: fargie_s
 **
 */
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
+#include <errno.h>
 
-#include "threading/mutex.hh"
-#include "threading/locker.hh"
+#include "threading/thread.hh"
 
-class TestLocker : public CppUnit::TestFixture
+class SimpleThread : public Thread
 {
-    CPPUNIT_TEST_SUITE(TestLocker);
+public:
+    SimpleThread() :
+        m_called(false)
+    {}
+
+    bool called()
+    {
+        return m_called;
+    }
+
+protected:
+    void thread_routine()
+    {
+        m_called = true;
+    }
+
+    bool m_called;
+};
+
+class TestThread : public CppUnit::TestFixture
+{
+    CPPUNIT_TEST_SUITE(TestThread);
     CPPUNIT_TEST(simple);
     CPPUNIT_TEST_SUITE_END();
 
 public:
     void simple()
     {
-        Mutex m;
+        SimpleThread s;
 
-        {
-            Locker l(m);
+        CPPUNIT_ASSERT_EQUAL(0, s.start());
 
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
+        CPPUNIT_ASSERT_EQUAL(0, s.join());
+        CPPUNIT_ASSERT(s.called());
+
+        CPPUNIT_ASSERT_EQUAL(ESRCH, s.join());
     }
-
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);
+CPPUNIT_TEST_SUITE_REGISTRATION(TestThread);
