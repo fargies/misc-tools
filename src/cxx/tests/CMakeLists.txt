@@ -8,11 +8,7 @@ pkg_check_modules(CPPUNIT cppunit)
 add_library(testHelper SHARED test_main.cc)
 target_link_libraries(testHelper ${CPPUNIT_LIBRARIES})
 
-set(test_SRCS
-    chrono_test.cc
-    sem_test.cc
-    fileLock_test.cc
-    iterator_test.cc)
+file(GLOB test_SRCS *_test.cc)
 
 add_executable(test_all ${test_SRCS})
 target_link_libraries(test_all testHelper cxx-misc-tools)

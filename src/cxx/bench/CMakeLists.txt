@@ -1,6 +1,5 @@
 
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/..)
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/../sem)
+#link_directories(${CMAKE_CURRENT_BINARY_DIR}/..)
 include_directories(.. ../sem)
 
 add_executable(rwLock_bench rwLock_bench.cc)

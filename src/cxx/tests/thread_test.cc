@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,41 +17,58 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** mutex.hh
+** thread_test.cc
 **
-**        Created on: Nov 13, 2011
+**        Created on: Apr 09, 2012
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __MUTEX_HH__
-#define __MUTEX_HH__
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/TestFixture.h>
+#include <errno.h>
 
-#include <pthread.h>
+#include "threading/thread.hh"
 
-#ifdef NDEBUG
-#define DEFAULT_MUTEX_TYPE PTHREAD_MUTEX_DEFAULT
-#else
-#define DEFAULT_MUTEX_TYPE PTHREAD_MUTEX_ERRORCHECK
-#endif
-
-class Mutex
+class SimpleThread : public Thread
 {
 public:
-    Mutex(int type = DEFAULT_MUTEX_TYPE);
-    ~Mutex();
+    SimpleThread() :
+        m_called(false)
+    {}
 
-    void lock();
-    bool trylock();
-    void unlock();
+    bool called()
+    {
+        return m_called;
+    }
 
 protected:
-    pthread_mutex_t m_mutex;
+    void thread_routine()
+    {
+        m_called = true;
+    }
 
-private:
-    Mutex(const Mutex &);
-    Mutex &operator =(const Mutex &);
+    bool m_called;
 };
 
-#endif
+class TestThread : public CppUnit::TestFixture
+{
+    CPPUNIT_TEST_SUITE(TestThread);
+    CPPUNIT_TEST(simple);
+    CPPUNIT_TEST_SUITE_END();
 
+public:
+    void simple()
+    {
+        SimpleThread s;
+
+        CPPUNIT_ASSERT_EQUAL(0, s.start());
+
+        CPPUNIT_ASSERT_EQUAL(0, s.join());
+        CPPUNIT_ASSERT(s.called());
+
+        CPPUNIT_ASSERT_EQUAL(ESRCH, s.join());
+    }
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION(TestThread);

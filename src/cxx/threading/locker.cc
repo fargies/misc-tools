@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,41 +17,24 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** mutex.hh
+** locker.cc
 **
-**        Created on: Nov 13, 2011
+**        Created on: Apr 06, 2012
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __MUTEX_HH__
-#define __MUTEX_HH__
+#include "locker.hh"
+#include "mutex.hh"
 
-#include <pthread.h>
-
-#ifdef NDEBUG
-#define DEFAULT_MUTEX_TYPE PTHREAD_MUTEX_DEFAULT
-#else
-#define DEFAULT_MUTEX_TYPE PTHREAD_MUTEX_ERRORCHECK
-#endif
-
-class Mutex
+Locker::Locker(Mutex &m) :
+    m_mutex(m)
 {
-public:
-    Mutex(int type = DEFAULT_MUTEX_TYPE);
-    ~Mutex();
+    m_mutex.lock();
+}
 
-    void lock();
-    bool trylock();
-    void unlock();
-
-protected:
-    pthread_mutex_t m_mutex;
-
-private:
-    Mutex(const Mutex &);
-    Mutex &operator =(const Mutex &);
-};
-
-#endif
+Locker::~Locker()
+{
+    m_mutex.unlock();
+}
 

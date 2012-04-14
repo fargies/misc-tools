@@ -94,6 +94,38 @@ void Expat<Parser>::removeDataWatch()
 }
 
 template <class Parser>
+void Expat<Parser>::setHandlers(Handler start, Handler e)
+{
+    this->start = start;
+    this->end = e;
+    if (start != NULL)
+        XML_SetStartElementHandler(m_parser, &(__startHdlr<Parser>));
+    else
+        XML_SetStartElementHandler(m_parser, NULL);
+
+
+    if (end != NULL)
+        XML_SetEndElementHandler(m_parser, &(__endHdlr<Parser>));
+    else
+        XML_SetEndElementHandler(m_parser, NULL);
+}
+
+template <class Parser>
+void Expat<Parser>::setStartHandler(Handler start)
+{
+    this->start = start;
+    XML_SetStartElementHandler(m_parser, (start != NULL)? &(__startHdlr<Parser>) : NULL);
+}
+
+template <class Parser>
+void Expat<Parser>::setEndHandler(Handler end)
+{
+    this->end = end;
+    XML_SetEndElementHandler(m_parser, (end != NULL)? &(__endHdlr<Parser>) : NULL);
+}
+
+
+template <class Parser>
 std::map<std::string, const XML_Char *> &Expat<Parser>::attributes()
 {
   if (m_raw_attrs && m_attrs.empty()) {
