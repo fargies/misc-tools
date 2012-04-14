@@ -24,8 +24,8 @@
 **
 */
 
-#ifndef EXPAT_HXX_
-#define EXPAT_HXX_
+#ifndef EXPATPP_HXX_
+#define EXPATPP_HXX_
 
 #include <errno.h>
 #include "expat++.hh"
@@ -59,12 +59,12 @@ void __dataHdlr(void *data, const XML_Char *str, int size)
 
 template <class Parser>
 Expat<Parser>::Expat() :
-  start(NULL), end(NULL), m_accu(NULL)
+  m_accu(NULL), start(NULL), end(NULL)
 {
   m_parser = XML_ParserCreate(NULL);
   XML_SetUserData(m_parser, this);
-  XML_SetStartElementHandler(m_parser, &(__startHdlr<Parser>));
-  XML_SetEndElementHandler(m_parser, &(__endHdlr<Parser>));
+  XML_SetStartElementHandler(m_parser, NULL);
+  XML_SetEndElementHandler(m_parser, NULL);
   XML_SetCharacterDataHandler(m_parser, NULL);
 }
 
@@ -142,5 +142,6 @@ int Expat<Parser>::parseFile(const char *name)
   return ret;
 }
 
-#endif /* EXPAT_HXX_ */
 
+
+#endif /* EXPAT_HXX_ */

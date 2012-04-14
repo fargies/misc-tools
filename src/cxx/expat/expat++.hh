@@ -24,8 +24,8 @@
 **
 */
 
-#ifndef EXPATPP_H_
-#define EXPATPP_H_
+#ifndef EXPATPP_HH_
+#define EXPATPP_HH_
 
 #include <map>
 #include <string>
@@ -55,8 +55,12 @@ public:
    * @details if accu is NULL, an internal accumulator will be used (m_data)
    * @param accu the data accumulator
    */
-  void addDataWatch(std::string *accu);
+  void addDataWatch(std::string *accu = NULL);
   void removeDataWatch();
+
+  void setHandlers(Handler start, Handler end);
+  void setStartHandler(Handler start);
+  void setEndHandler(Handler end);
 
   /**
    * @brief returns current item attributes
@@ -89,4 +93,4 @@ protected:
 
 #include "expat++.hxx"
 
-#endif /* EXPAT_H_ */
+#endif /* EXPATPP_HH_ */
