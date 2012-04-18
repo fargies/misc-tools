@@ -12,10 +12,9 @@ file(GLOB variant_SRCS variant/*.hh variant/*.cc)
 set(variant_DEPS ${DBUS_CPP_LIBRARIES})
 include_directories(${DBUS_CPP_INCLUDE_DIRS} ${CMAKE_BINARY_DIR})
 
+file(GLOB SRCS *.cc *.hh)
 set(cxx_misc_SRCS
-    fileLock.cc fileLock.hh
-    chrono.cc chrono.hh
-    ${threading_SRCS} ${sem_SRCS} ${variant_SRCS})
+    ${SRCS} ${threading_SRCS} ${sem_SRCS} ${variant_SRCS})
 
 add_library(cxx-misc-tools SHARED ${cxx_misc_SRCS})
 

@@ -28,6 +28,9 @@
 #define __ITERATOR_TEST__
 
 #include <list>
+#include <map>
+#include <vector>
+#include <set>
 
 template < typename V >
 class Iterator

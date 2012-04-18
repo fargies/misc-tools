@@ -24,13 +24,14 @@
 **
 */
 
+#include <errno.h>
+
 #include "mutex.hh"
 
 #ifdef NDEBUG
 #define CHECK_EQ0(cmd) cmd
 #else
 #include <stdio.h>
-#include <errno.h>
 #include <assert.h>
 #include <string.h>
 
