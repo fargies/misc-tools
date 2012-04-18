@@ -24,6 +24,8 @@
 **
 */
 
+#if !defined(NDEBUG)
+
 #include <cstdio>
 #include <cstring>
 
@@ -36,6 +38,7 @@
 #define DEBUG_NULL_STR  "null"
 
 static char buffer[DEBUG_BUFF_SIZE];
+
 
 Debug &Debug::operator <<(Debug::DebugMod m)
 {
@@ -71,23 +74,6 @@ Debug &Debug::operator <<(const char *str)
             buffer[m_pos++] = '"';
     }
     return *this;
-}
-
-void Debug::puts(const char *str)
-{
-    if (m_pos && (m_pos + strlen(str)) > DEBUG_BUFF_SIZE)
-        flush();
-
-    while (*str != '\0' && m_pos < DEBUG_BUFF_SIZE)
-        buffer[m_pos++] = *(str++);
-}
-
-void Debug::putc(char c)
-{
-    if (m_pos == DEBUG_BUFF_SIZE)
-        flush();
-
-    buffer[m_pos++] = c;
 }
 
 Debug &Debug::operator <<(int i)
@@ -159,6 +145,23 @@ Debug &Debug::operator <<(const NoFormat &f)
     return *this;
 }
 
+void Debug::puts(const char *str)
+{
+    if (m_pos && (m_pos + strlen(str)) > DEBUG_BUFF_SIZE)
+        flush();
+
+    while (*str != '\0' && m_pos < DEBUG_BUFF_SIZE)
+        buffer[m_pos++] = *(str++);
+}
+
+void Debug::putc(char c)
+{
+    if (m_pos == DEBUG_BUFF_SIZE)
+        flush();
+
+    buffer[m_pos++] = c;
+}
+
 void Debug::flush()
 {
     if (m_pos)
@@ -175,6 +178,8 @@ Debug &operator <<(Debug &d, const std::string &s)
     d << s.c_str();
     return d;
 }
+
+#endif
 
 #endif
 

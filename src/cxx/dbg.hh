@@ -64,7 +64,7 @@ public:
 
 #if defined(NDEBUG)
     template <typename T>
-        Debug &operator <<(T);
+        Debug &operator <<(T) __attribute__ ((__error__("shouldn't be called")));
 
 #else
 
@@ -78,12 +78,11 @@ public:
     Debug &operator <<(DebugMod);
     Debug &operator <<(const NoFormat &);
 
-#endif
-
 protected:
     void puts(const char *);
     void putc(char);
     void flush();
+#endif
 
 private:
     unsigned int m_pos;
@@ -91,8 +90,8 @@ private:
 };
 
 #if defined(NDEBUG)
-#define DBG if (0) Debug()
-#define DBG(s) if (0) Debug()
+#define DBG if (0) Debug().ref()
+#define SDBG(s) if (0) Debug().ref()
 #else
 #define DBG Debug().ref()
 #define SDBG(s) Debug().ref() << NoFormat(s)
