@@ -49,12 +49,27 @@ public:
       DBG << 'c';
       DBG << true << " != " << false;
       DBG << '0' << " < " << '1';
+
 #ifdef DEBUG_STL
       std::map<int, std::string> m;
-      m[0] = "test";
-      m[1] = "test2";
 
+      DBG << "dumping empty map: " << m;
+
+      m[0] = "test";
+      DBG << "dumping small map: " << m;
+
+      m[1] = "test2";
       DBG << "dumping map: " << m;
+
+      std::list<short> l;
+
+      DBG << "dumping empty list: " << l;
+
+      l.push_back(42);
+      DBG << "dumping small list: " << l;
+
+      l.push_back(44);
+      DBG << "dumping list: " << l;
 #endif
   }
 };
