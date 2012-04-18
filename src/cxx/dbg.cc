@@ -36,6 +36,9 @@
 #define DEBUG_TRUE_STR  "true"
 #define DEBUG_FALSE_STR "false"
 #define DEBUG_NULL_STR  "null"
+#define DEBUG_INDENT_STR "  "
+#define DEBUG_INDENT_LEN (sizeof (DEBUG_INDENT_STR) - 1)
+#define DEBUG_MAX_INDENT (DEBUG_BUFF_SIZE / DEBUG_INDENT_LEN / 2)
 
 static char buffer[DEBUG_BUFF_SIZE];
 
@@ -63,7 +66,17 @@ Debug &Debug::operator <<(const char *str)
     if (str == NULL)
         puts(DEBUG_NULL_STR);
     else
+        puts(str);
+    return *this;
+}
+
+Debug &Debug::operator <<(const Quoted &f)
+{
+    if (!f.m_str)
+        puts(DEBUG_NULL_STR);
+    else
     {
+        const char *str = f.m_str;
         if (m_pos && (m_pos + strlen(str) + 2) > DEBUG_BUFF_SIZE)
             flush();
 
@@ -136,15 +149,6 @@ Debug &Debug::operator <<(short s)
     return *this;
 }
 
-Debug &Debug::operator <<(const NoFormat &f)
-{
-    if (f.m_str)
-        puts(f.m_str);
-    else
-        puts(DEBUG_NULL_STR);
-    return *this;
-}
-
 void Debug::puts(const char *str)
 {
     if (m_pos && (m_pos + strlen(str)) > DEBUG_BUFF_SIZE)
@@ -169,13 +173,23 @@ void Debug::flush()
         fwrite(buffer, m_pos, 1, stderr);
         fflush(stderr);
         m_pos = 0;
+
+        unsigned int indent = (m_indent > DEBUG_MAX_INDENT) ?
+                DEBUG_MAX_INDENT : m_indent;
+        char *tmp_buf = buffer;
+        while (indent--)
+        {
+            memcpy(tmp_buf, DEBUG_INDENT_STR, DEBUG_INDENT_LEN);
+            tmp_buf += DEBUG_INDENT_LEN;
+            m_pos += DEBUG_INDENT_LEN;
+        }
     }
 }
 
 #ifdef DEBUG_STL
 Debug &operator <<(Debug &d, const std::string &s)
 {
-    d << s.c_str();
+    d << Debug::Quoted(s.c_str());
     return d;
 }
 

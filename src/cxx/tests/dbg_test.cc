@@ -47,14 +47,14 @@ public:
       DBG << static_cast<short>(1234);
       DBG << "this is a char *";
       DBG << 'c';
-      DBG << true << NoFormat(" != ") << false;
-      DBG << '0' << NoFormat(" < ") << '1';
+      DBG << true << " != " << false;
+      DBG << '0' << " < " << '1';
 #ifdef DEBUG_STL
       std::map<int, std::string> m;
       m[0] = "test";
       m[1] = "test2";
 
-      SDBG("dumping map: ") << m;
+      DBG << "dumping map: " << m;
 #endif
   }
 };

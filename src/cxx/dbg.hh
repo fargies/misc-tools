@@ -29,14 +29,6 @@
 
 #define DEBUG_STL
 
-struct NoFormat
-{
-    NoFormat(const char *str) :
-        m_str(str)
-    {}
-    const char *m_str;
-};
-
 class Debug
 {
 public:
@@ -62,6 +54,14 @@ public:
         OUTDENT
     };
 
+    struct Quoted
+    {
+        Quoted(const char *str) :
+            m_str(str)
+        {}
+        const char *m_str;
+    };
+
 #if defined(NDEBUG)
     template <typename T>
         Debug &operator <<(T) __attribute__ ((__error__("shouldn't be called")));
@@ -76,7 +76,7 @@ public:
     Debug &operator <<(unsigned int);
     Debug &operator <<(const char *);
     Debug &operator <<(DebugMod);
-    Debug &operator <<(const NoFormat &);
+    Debug &operator <<(const Quoted &);
 
 protected:
     void puts(const char *);
@@ -91,10 +91,8 @@ private:
 
 #if defined(NDEBUG)
 #define DBG if (0) Debug().ref()
-#define SDBG(s) if (0) Debug().ref()
 #else
 #define DBG Debug().ref()
-#define SDBG(s) Debug().ref() << NoFormat(s)
 #endif
 
 #ifdef DEBUG_STL
@@ -127,7 +125,7 @@ Debug &operator <<(Debug &d, const std::list<T> &l)
 template <typename K, typename V>
 Debug &operator <<(Debug &d, const std::map<K, V> &m)
 {
-    d << NoFormat("{ ") << Debug::INDENT << Debug::NL;
+    d << "{ " << Debug::INDENT;
 
     bool first = true;
     for (typename std::map<K, V>::const_iterator it = m.begin();
@@ -135,14 +133,19 @@ Debug &operator <<(Debug &d, const std::map<K, V> &m)
     {
         if (first)
         {
-            d << it->first << NoFormat(" : ") << it->second;
+            d << Debug::NL << it->first << " : " << it->second;
             first = false;
         }
         else
-            d << NoFormat(", ") << Debug::NL <<
-                it->first << NoFormat(" : ") << it->second;
+            d << ", " << Debug::NL <<
+                it->first << " : " << it->second;
     }
-    d << NoFormat(" }") << Debug::OUTDENT << Debug::NL;
+    if (!first) /* the map is not empty */
+        d << Debug::OUTDENT << Debug::NL;
+    else
+        d << Debug::OUTDENT;
+    d << "}" << Debug::NL;
+    return d;
 }
 
 Debug &operator <<(Debug &d, const std::string &);
