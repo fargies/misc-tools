@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2010 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,40 +17,38 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** chrono.hh
+** dbg.hxx
 **
-**        Created on: Sep 24, 2010
-**            Author: fargie_s
+**        Created on: Apr 26, 2012
+**   Original Author: fargie_s
 **
 */
 
-#ifndef __CHRONO_HH__
-#define __CHRONO_HH__
+#ifndef __DBG_HXX__
+#define __DBG_HXX__
 
-#include <ostream>
-#include <string>
-#include <time.h>
-#include <stdint.h>
+#if !defined(NDEBUG)
 
-class Chrono
+template <typename T>
+Debug &Debug::operator <<(const HexFmt<T> &f)
 {
-public:
-  Chrono();
+    size_t buff_size = DEBUG_BUFF_SIZE - m_pos;
 
-  void clear();
-  inline void start() { clock_gettime(CLOCK_MONOTONIC, &m_times[0]); }
-  inline void stop() { clock_gettime(CLOCK_MONOTONIC, &m_times[1]); }
+    if (m_pos && (sizeof(T) * 2 + 2) > buff_size)
+        flush();
 
-  uint32_t getMiliSecs() const;
-  operator std::string() const;
-  void getTimespec(struct timespec &timespec) const;
-  Chrono &operator += (const Chrono &);
+    m_pos += snprintf(&buf()[m_pos], buff_size, "0x%.*X",
+            (int) sizeof (T) * 2, f.m_val);
+    return *this;
+}
 
-protected:
-  struct timespec m_times[2];
-};
+#endif
 
-std::ostream &operator<< (std::ostream &os, const Chrono &chrono);
+template <typename T>
+inline Debug::HexFmt<T> Hex(const T &t)
+{
+    return Debug::HexFmt<T>(t);
+}
 
-#endif /* __CHRONO_H__ */
+#endif
 

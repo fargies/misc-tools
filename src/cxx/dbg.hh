@@ -29,6 +29,13 @@
 
 #define DEBUG_STL
 
+#define DEBUG_BUFF_SIZE 4096
+
+#define DEBUG_TRUE_STR  "true"
+#define DEBUG_FALSE_STR "false"
+#define DEBUG_NULL_STR  "null"
+#define DEBUG_INDENT_STR "  "
+
 class Debug
 {
 public:
@@ -62,6 +69,28 @@ public:
         const char *m_str;
     };
 
+    template <typename T>
+    class HexFmt
+    {
+    public:
+        HexFmt(const T &val) :
+            m_val(val)
+        {}
+
+        const T &m_val;
+    };
+
+    class DataFmt
+    {
+    public:
+        DataFmt(const void *data, size_t len) :
+            m_data((char *) data), m_len(len)
+        {}
+
+        const char *m_data;
+        size_t m_len;
+    };
+
 #if defined(NDEBUG)
     template <typename T>
         Debug &operator <<(T) __attribute__ ((__error__("shouldn't be called")));
@@ -78,6 +107,11 @@ public:
     Debug &operator <<(DebugMod);
     Debug &operator <<(const Quoted &);
 
+    template <typename T>
+    Debug &operator <<(const HexFmt<T> &);
+
+    Debug &operator <<(const DataFmt &);
+
 protected:
     void puts(const char *);
     void putc(char);
@@ -87,7 +121,12 @@ protected:
 private:
     unsigned int m_pos;
     unsigned int m_indent;
+
+    char *buf();
 };
+
+typedef Debug::DataFmt Data;
+#define Dump(T) Debug::DataFmt(&(T), sizeof (T))
 
 #if defined(NDEBUG)
 #define DBG if (0) Debug().ref()
@@ -151,6 +190,8 @@ Debug &operator <<(Debug &d, const std::map<K, V> &m)
 Debug &operator <<(Debug &d, const std::string &);
 
 #endif
+
+#include "dbg.hxx"
 
 #endif
 

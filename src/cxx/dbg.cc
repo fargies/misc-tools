@@ -28,20 +28,15 @@
 
 #include <cstdio>
 #include <cstring>
+#include <ctype.h>
 
 #include "dbg.hh"
 
-#define DEBUG_BUFF_SIZE 4096
-
-#define DEBUG_TRUE_STR  "true"
-#define DEBUG_FALSE_STR "false"
-#define DEBUG_NULL_STR  "null"
-#define DEBUG_INDENT_STR "  "
 #define DEBUG_INDENT_LEN (sizeof (DEBUG_INDENT_STR) - 1)
 #define DEBUG_MAX_INDENT (DEBUG_BUFF_SIZE / DEBUG_INDENT_LEN / 2)
+#define DEBUG_DATA_LEN 80
 
 static char buffer[DEBUG_BUFF_SIZE];
-
 
 Debug &Debug::operator <<(Debug::DebugMod m)
 {
@@ -149,6 +144,56 @@ Debug &Debug::operator <<(short s)
     return *this;
 }
 
+Debug &Debug::operator <<(const DataFmt &f)
+{
+    const char *data = f.m_data;
+    size_t remain = f.m_len;
+    /* FIXME SAVE INDENT THEN RESTORE */
+    if (m_pos)
+        flush();
+
+    while (remain)
+    {
+        m_pos += snprintf(&buffer[m_pos], 11, "%.8x  ",
+                (int) (f.m_len - remain));
+
+        /* we can print a whole line here */
+        size_t count = remain;
+        char *p = &buffer[m_pos];
+        char *d = p + 16 * 3 + 1;
+        *(d++) = '|';
+
+        if (count > 16)
+            count = 16;
+        for (size_t i = 0; i < 16; ++i)
+        {
+            if (i < count)
+            {
+                unsigned char c = (*(data++));
+                *(p++) = (c >> 4) + ((c > 0x9F) ? ('A' - 10) : '0');
+                *(p++) = (c & 0x0F) + (((c & 0x0F) > 0x09) ? ('a' - 10) : '0');
+                *(p++) = ' ';
+                *(d++) = isprint(c) ? c : '.';
+            }
+            else
+            {
+                *(p++) = ' ';
+                *(p++) = ' ';
+                *(p++) = ' ';
+            }
+            if (i == 8)
+                *(p++) = ' ';
+        }
+        remain -= count;
+        *(d++) = '|';
+        *(d++) = '\n';
+
+        m_pos += 16 * 3 + 1 + count + 2 + 1;
+        flush();
+    }
+    return *this;
+}
+
 void Debug::puts(const char *str)
 {
     if (m_pos && (m_pos + strlen(str)) > DEBUG_BUFF_SIZE)
@@ -171,7 +216,6 @@ void Debug::flush()
     if (m_pos)
     {
         fwrite(buffer, m_pos, 1, stderr);
-        fflush(stderr);
         m_pos = 0;
 
         unsigned int indent = (m_indent > DEBUG_MAX_INDENT) ?
@@ -184,6 +228,11 @@ void Debug::flush()
             m_pos += DEBUG_INDENT_LEN;
         }
     }
+}
+
+char *Debug::buf()
+{
+    return buffer;
 }
 
 #ifdef DEBUG_STL

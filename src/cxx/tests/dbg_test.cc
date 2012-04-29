@@ -36,6 +36,8 @@ class TestDbg : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestDbg);
   CPPUNIT_TEST(simple);
+  CPPUNIT_TEST(format);
+  CPPUNIT_TEST(data);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -56,6 +58,26 @@ public:
 
       DBG << "dumping map: " << m;
 #endif
+  }
+
+  void format()
+  {
+      Debug::HexFmt<int> a(0xDEADBEEF);
+      DBG << a;
+
+      DBG << Hex((char) 42) << " " << Hex(1234);
+  }
+
+  void data()
+  {
+      char buffer[] = { 'a', 'b', 'c', '0', '1',
+          '2', '3', '4', '5', '6', 42, 12, 29, 16,
+          'Z', 4, 125, 12, 'L', '[', 230
+      };
+      Debug::DataFmt d(buffer, sizeof (buffer));
+      DBG << d << Debug::DataFmt(buffer, sizeof (buffer)) <<
+          Data(buffer, sizeof (buffer));
+      DBG << Dump(buffer);
   }
 };
 
