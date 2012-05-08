@@ -72,8 +72,8 @@ protected:
    * @details when value is NULL, PySequence_ITEM is used to find out the real value
    */
   PySeqValue(PyObject *seq, Py_ssize_t index, PyObject *value = NULL);
-  PySeqValue &reseat(PyObject *seq, Py_ssize_t index, PyObject *value = NULL);
-  PySeqValue &reseat(const PySeqValue &value);
+  PySeqValue &reset(PyObject *seq, Py_ssize_t index, PyObject *value = NULL);
+  PySeqValue &reset(const PySeqValue &value);
 
   template <typename T> friend class PySeqBase; //FIXME
   template <typename T> friend class PySeqIterator;

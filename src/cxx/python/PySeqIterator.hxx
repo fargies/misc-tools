@@ -62,7 +62,7 @@ PySeqIterator<V> &PySeqIterator<V>::operator = (const PySeqIterator<V> &it)
   if (this != &it) {
     m_pos = it.m_pos;
     m_seq = it.m_seq;
-    m_value.reseat(it.m_value);
+    m_value.reset(it.m_value);
   }
   return *this;
 }
@@ -124,7 +124,7 @@ void PySeqIterator<V>::getNext()
     clear();
   }
   else {
-    m_value.reseat(m_seq, m_pos, obj);
+    m_value.reset(m_seq, m_pos, obj);
     Py_DECREF(obj);
   }
 }
@@ -138,7 +138,7 @@ void PySeqIterator<V>::getPrev()
     PyErr_Clear();
     clear();
   } else {
-    m_value.reseat(m_seq, m_pos, obj);
+    m_value.reset(m_seq, m_pos, obj);
     Py_DECREF(obj);
   }
 }
@@ -147,7 +147,7 @@ template <typename V>
 void PySeqIterator<V>::clear()
 {
   m_pos = -1;
-  m_value.reseat(NULL, NULL, NULL);
+  m_value.reset(NULL, 0, NULL);
   m_seq = NULL;
 }
 

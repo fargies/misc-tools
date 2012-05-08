@@ -46,13 +46,13 @@ PySeqValue<V>::PySeqValue(PyObject *seq, Py_ssize_t index, PyObject *value) :
 }
 
 template <typename V>
-PySeqValue<V> &PySeqValue<V>::reseat(const PySeqValue<V> &value)
+PySeqValue<V> &PySeqValue<V>::reset(const PySeqValue<V> &value)
 {
-  return reseat(value.m_seq, value.m_pos, value.m_value);
+  return reset(value.m_seq, value.m_pos, value.m_value);
 }
 
 template <typename V>
-PySeqValue<V> &PySeqValue<V>::reseat(PyObject *seq, Py_ssize_t index, PyObject *value)
+PySeqValue<V> &PySeqValue<V>::reset(PyObject *seq, Py_ssize_t index, PyObject *value)
 {
   m_pos = index;
   m_seq = seq;

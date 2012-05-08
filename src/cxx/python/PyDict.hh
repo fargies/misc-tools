@@ -73,8 +73,8 @@ protected:
    * @details creates a Py_None value in the dict if the given key is not found
    */
   PyDictValue(PyObject *dict, PyObject *key, PyObject *value = NULL);
-  PyDictValue &reseat(PyObject *dict, PyObject *key, PyObject *value = NULL);
-  PyDictValue &reseat(const PyDictValue &value);
+  PyDictValue &reset(PyObject *dict, PyObject *key, PyObject *value = NULL);
+  PyDictValue &reset(const PyDictValue &value);
 
   mutable PyObject *m_dict, *m_key;
 

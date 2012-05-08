@@ -40,12 +40,12 @@ PyDictValue::PyDictValue(PyObject *dict, PyObject *key, PyObject *value) :
   Py_INCREF(key);
 }
 
-PyDictValue &PyDictValue::reseat(const PyDictValue &value)
+PyDictValue &PyDictValue::reset(const PyDictValue &value)
 {
-  return reseat(value.m_dict, value.m_key, value.m_value);
+  return reset(value.m_dict, value.m_key, value.m_value);
 }
 
-PyDictValue &PyDictValue::reseat(PyObject *dict, PyObject *key, PyObject *value)
+PyDictValue &PyDictValue::reset(PyObject *dict, PyObject *key, PyObject *value)
 {
   Py_XINCREF(key);
   Py_XDECREF(m_key);
