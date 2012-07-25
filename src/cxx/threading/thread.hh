@@ -41,7 +41,8 @@ public:
     typedef enum {
         STOPPED,
         RUNNING,
-        DETACHED
+        DETACHED,
+        ZOMBI
     } State;
 
     Thread();

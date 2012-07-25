@@ -59,6 +59,8 @@ void *Thread::thread_routine_wrapper(void *data)
     TCOND_LOCKER(thread->m_thread_cond);
     if (thread->m_thread_state == DETACHED)
         thread->m_thread_state = STOPPED;
+    else
+        thread->m_thread_state = ZOMBI;
     TCOND_BROADCAST(thread->m_thread_cond);
 
     pthread_exit(0);
@@ -85,18 +87,19 @@ int Thread::join()
     switch (m_thread_state)
     {
         case RUNNING:
+            TCOND_WAIT(m_thread_cond);
+
+            if (m_thread_state == STOPPED)
+                return 0;
+            else if (m_thread_state != ZOMBI)
+                return -1; // should never happen
+            /* continue with ZOMBI */
+        case ZOMBI:
             {
-                TCOND_WAIT(m_thread_cond);
+                void *value_ptr;
+                int rc = pthread_join(m_thread_id, &value_ptr);
 
-                int rc = 0;
-
-                if (m_thread_state == RUNNING)
-                {
-                    void *value_ptr;
-                    rc = pthread_join(m_thread_id, &value_ptr);
-                }
                 m_thread_state = STOPPED;
-
                 return rc;
             }
         case DETACHED:
@@ -118,6 +121,14 @@ int Thread::detach()
                 if (rc == 0)
                     m_thread_state = DETACHED;
 
+                return rc;
+            }
+        case ZOMBI:
+            {
+                void *value_ptr;
+                int rc = pthread_join(m_thread_id, &value_ptr);
+
+                m_thread_state = STOPPED;
                 return rc;
             }
         case DETACHED:
