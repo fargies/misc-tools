@@ -17,48 +17,65 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** Dispatcher.hh
+** TimerPrivate.hh
 **
-**        Created on: Nov 09, 2012
+**        Created on: Nov 10, 2012
 **   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
 
-#ifndef __DISPATCHER_HH__
-#define __DISPATCHER_HH__
+#ifndef __TIMER_PRIVATE_HH__
+#define __TIMER_PRIVATE_HH__
 
-#include "EventHandler.hh"
-#include "Event.hh"
-#include "FDWatch.hh"
-#include "autoRef.hh"
+#include <stdint.h>
 
-class DispatcherPrivate;
+#include "DispatcherPrivate.hh"
 
-class Dispatcher
+class Timer;
+
+class TimerPrivate : public RefCounter
 {
 public:
-    Dispatcher();
-    ~Dispatcher();
+    /**
+     * @brief TimerPrivate constructor.
+     *
+     * @param[in] timer the Timer it belongs to.
+     * @param[in] interval the timer interval.
+     */
+    TimerPrivate(uint32_t interval, TimerHandler &handler) :
+        m_interval(interval), m_handler(&handler)
+    {}
 
-    Dispatcher(const Dispatcher &disp);
-    Dispatcher &operator =(const Dispatcher &disp);
+    ~TimerPrivate()
+    {}
 
-    void post(EventBase *evt);
+    inline uint32_t getInterval() const
+    {
+        return m_interval;
+    }
 
-    void addHandler(EventHandler *handler, EventBase::type type);
-    void removeHandler(EventHandler *handler, EventBase::type type);
+    inline void setInterval(uint32_t interval)
+    {
+        m_interval = interval;
+    }
 
-    void addHandler(FDWatch *handler, int fd, FDWatch::direction dir);
-    void removeHandler(FDWatch *handler, int fd, FDWatch::direction dir);
+    inline const struct timespec &getTime() const
+    {
+        return m_time;
+    }
 
-    int dispatch(int timeout);
-
-    void wake();
+    inline void setHandler(TimerHandler &handler)
+    {
+        m_handler = &handler;
+    }
 
 protected:
-    AutoRef<DispatcherPrivate> m_pdisp;
+    struct timespec     m_time;
+    uint32_t            m_interval;
+    TimerHandler       *m_handler;
+    TimerList::iterator m_it;
 
-    friend class Timer;
+    friend class DispatcherPrivate;
 };
 
 #endif

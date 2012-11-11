@@ -17,48 +17,25 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** Dispatcher.hh
+** TimerHandler.hh
 **
-**        Created on: Nov 09, 2012
+**        Created on: Nov 11, 2012
 **   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
 
-#ifndef __DISPATCHER_HH__
-#define __DISPATCHER_HH__
+#ifndef __TIMER_HANDLER_HH__
+#define __TIMER_HANDLER_HH__
 
-#include "EventHandler.hh"
-#include "Event.hh"
-#include "FDWatch.hh"
-#include "autoRef.hh"
-
-class DispatcherPrivate;
-
-class Dispatcher
+class TimerHandler
 {
 public:
-    Dispatcher();
-    ~Dispatcher();
+    virtual ~TimerHandler();
 
-    Dispatcher(const Dispatcher &disp);
-    Dispatcher &operator =(const Dispatcher &disp);
-
-    void post(EventBase *evt);
-
-    void addHandler(EventHandler *handler, EventBase::type type);
-    void removeHandler(EventHandler *handler, EventBase::type type);
-
-    void addHandler(FDWatch *handler, int fd, FDWatch::direction dir);
-    void removeHandler(FDWatch *handler, int fd, FDWatch::direction dir);
-
-    int dispatch(int timeout);
-
-    void wake();
-
-protected:
-    AutoRef<DispatcherPrivate> m_pdisp;
-
-    friend class Timer;
+    /**
+     * @return true to restart the timer, false to stop it.
+     */
+    virtual bool handle() = 0;
 };
 
 #endif
