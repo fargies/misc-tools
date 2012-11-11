@@ -145,6 +145,17 @@ public:
             _timer.setHandler(*this);
             _timer.isRunning();
             _timer.setInterval(0);
+
+            /* test various calls */
+            if (_recur == 1)
+            {
+                _timer.stop(false); /* don't wait for ourselef to terminate */
+                _timer.start();
+            }
+            else if (_recur == 2)
+                _timer.stop(false);
+            else if (_recur == 3)
+                _timer.start();
             ret = true;
         }
         else

@@ -57,7 +57,7 @@ void Timer::start()
 
 void Timer::stop(bool wait)
 {
-    m_disp.m_pdisp->stopTimer(*m_ptimer);
+    m_disp.m_pdisp->stopTimer(*m_ptimer, wait);
 }
 
 void Timer::restart()
