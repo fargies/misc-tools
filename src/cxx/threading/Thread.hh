@@ -17,27 +17,64 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** TimerHandler.hh
+** Thread.hh
 **
-**        Created on: Nov 11, 2012
-**   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
+**        Created on: Apr 08, 2012
+**   Original Author: fargie_s
 **
 */
 
-#ifndef __TIMER_HANDLER_HH__
-#define __TIMER_HANDLER_HH__
+#ifndef __THREAD_HH__
+#define __THREAD_HH__
 
-namespace notifier {
+#include <pthread.h>
 
-class TimerHandler
+#define THREAD_SAFE
+
+#ifdef THREAD_SAFE
+#include "Cond.hh"
+#endif
+
+namespace threading {
+
+class Thread
 {
 public:
-    virtual ~TimerHandler();
+    typedef enum {
+        STOPPED,
+        RUNNING,
+        DETACHED,
+        ZOMBI
+    } State;
+
+    Thread();
+    virtual ~Thread();
+
+    int start();
+
+    int join();
+
+    int detach();
+
+    State state() const;
 
     /**
-     * @return true to restart the timer, false to stop it.
+     * @brief send a signal to the running thread.
+     * @details calls pthread_kill.
      */
-    virtual bool handle() = 0;
+    int kill(int);
+
+protected:
+    virtual void thread_routine() = 0;
+
+private:
+    pthread_t m_thread_id;
+#ifdef THREAD_SAFE
+    mutable Cond m_thread_cond;
+#endif
+    State m_thread_state;
+
+    static void *thread_routine_wrapper(void *data);
 };
 
 }

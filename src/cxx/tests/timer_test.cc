@@ -30,6 +30,8 @@
 #include "notifier/Dispatcher.hh"
 #include "notifier/Timer.hh"
 
+using namespace notifier;
+
 class MyTimerHandler : public TimerHandler
 {
 public:

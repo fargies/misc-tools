@@ -17,30 +17,24 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** TimerHandler.hh
+** Singleton.cc
 **
-**        Created on: Nov 11, 2012
-**   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
+**        Created on: Nov 12, 2012
+**   Original Author: Sylvain Fargier <fargier.sylvain@free.fr>
 **
 */
 
-#ifndef __TIMER_HANDLER_HH__
-#define __TIMER_HANDLER_HH__
+#include "Singleton.hh"
 
-namespace notifier {
+threading::Mutex SingletonMutex::m_lock(PTHREAD_MUTEX_RECURSIVE);
 
-class TimerHandler
+SingletonMutex::SingletonMutex()
 {
-public:
-    virtual ~TimerHandler();
-
-    /**
-     * @return true to restart the timer, false to stop it.
-     */
-    virtual bool handle() = 0;
-};
-
+    m_lock.lock();
 }
 
-#endif
+SingletonMutex::~SingletonMutex()
+{
+    m_lock.unlock();
+}
 

@@ -30,7 +30,10 @@
 #include "Dispatcher.hh"
 #include "DispatcherPrivate.hh"
 
-#include "threading/locker.hh"
+#include "threading/Locker.hh"
+
+using namespace notifier;
+using namespace threading;
 
 TimerHandler::~TimerHandler()
 {}
@@ -47,7 +50,9 @@ Timer::Timer(
 
 Timer::~Timer()
 {
-    m_disp.m_pdisp->stopTimer(*m_ptimer);
+    /* wait for the handler to terminate only if we're not in the dispatcher
+     * already */
+    m_disp.m_pdisp->stopTimer(*m_ptimer, !m_disp.inDispatcher());
 }
 
 void Timer::start()

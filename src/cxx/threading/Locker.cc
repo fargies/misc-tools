@@ -17,37 +17,26 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** cond.hh
+** locker.cc
 **
 **        Created on: Apr 06, 2012
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __COND_HH__
-#define __COND_HH__
+#include "Locker.hh"
+#include "Mutex.hh"
 
-#include <pthread.h>
-#include "mutex.hh"
+using namespace threading;
 
-class Cond : public Mutex
+Locker::Locker(Mutex &m) :
+    m_mutex(m)
 {
-public:
-    Cond();
-    ~Cond();
+    m_mutex.lock();
+}
 
-    void wait();
-    int timedWait(int timeout);
-    void signal();
-    void broadcast();
-
-protected:
-    pthread_cond_t m_cond;
-
-private:
-    Cond(const Cond &);
-    Cond &operator =(const Cond &);
-};
-
-#endif
+Locker::~Locker()
+{
+    m_mutex.unlock();
+}
 

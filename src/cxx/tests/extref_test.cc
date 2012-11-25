@@ -27,7 +27,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
 
-#include "extRef.hh"
+#include "ExtRef.hh"
 
 class ExtRefedObject
 {

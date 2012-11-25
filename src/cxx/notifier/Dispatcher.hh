@@ -27,10 +27,12 @@
 #ifndef __DISPATCHER_HH__
 #define __DISPATCHER_HH__
 
+#include "AutoRef.hh"
 #include "EventHandler.hh"
 #include "Event.hh"
 #include "FDWatch.hh"
-#include "autoRef.hh"
+
+namespace notifier {
 
 class DispatcherPrivate;
 
@@ -53,6 +55,15 @@ public:
 
     int dispatch(int timeout);
 
+    /**
+     * @brief check if current thread is in the dispatcher context.
+     *
+     * @return
+     *  - true if the caller is in the dispatcher.
+     *  - false otherwise.
+     */
+    bool inDispatcher();
+
     void wake();
 
 protected:
@@ -60,6 +71,8 @@ protected:
 
     friend class Timer;
 };
+
+}
 
 #endif
 

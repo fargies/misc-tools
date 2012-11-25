@@ -28,7 +28,9 @@
 #include <cppunit/TestFixture.h>
 #include <errno.h>
 
-#include "threading/thread.hh"
+#include "threading/Thread.hh"
+
+using namespace threading;
 
 class SimpleThread : public Thread
 {

@@ -26,6 +26,8 @@
 
 #include "FDWatch.hh"
 
+using namespace notifier;
+
 FDWatch::~FDWatch()
 {}
 

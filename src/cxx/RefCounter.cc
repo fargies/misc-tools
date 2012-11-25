@@ -24,7 +24,7 @@
 **
 */
 
-#include "refCounter.hh"
+#include "RefCounter.hh"
 #include <assert.h>
 
 int RefCounter::incRef()

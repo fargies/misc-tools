@@ -40,13 +40,25 @@
 #include "TimerPrivate.hh"
 #include "TimerHandler.hh"
 
-#include "threading/locker.hh"
-#include "threading/mutex.hh"
-#include "refCounter.hh"
-#include "autoPtr.hh"
+#include "threading/Locker.hh"
+#include "threading/Mutex.hh"
+#include "RefCounter.hh"
+#include "AutoPtr.hh"
 #include "timespec.hh"
+#include "Logger.hh"
+
+//#define DISPATCHER_DEBUG
+#ifdef DISPATCHER_DEBUG
+#include <errno.h>
+#include <string.h>
+#define disp_debug(...) log_info(__VA_ARGS__)
+#else
+#define disp_debug(...)
+#endif
 
 using namespace std;
+using namespace notifier;
+using namespace threading;
 
 /**
  * @brief comparison operator to order the TimerList
@@ -79,7 +91,11 @@ DispatcherPrivate::~DispatcherPrivate()
 void DispatcherPrivate::wake()
 {
     uint64_t i = 1;
-    write(m_wakefd, &i, sizeof (i));
+    if (write(m_wakefd, &i, sizeof (i)) != sizeof (i))
+    {
+        disp_debug("[Dispatcher]: Failed to wake the dispatcher: %s",
+                strerror(errno));
+    }
 }
 
 void DispatcherPrivate::startTimer(TimerPrivate &ev)
@@ -212,12 +228,17 @@ void Dispatcher::removeHandler(FDWatch *handler, int fd, FDWatch::direction dir)
 
 int Dispatcher::dispatch(int timeout)
 {
-    m_pdisp->dispatch(timeout);
+    return m_pdisp->dispatch(timeout);
 }
 
 void Dispatcher::wake()
 {
     m_pdisp->wake();
+}
+
+bool Dispatcher::inDispatcher()
+{
+    return m_pdisp->inDispatcher();
 }
 
 struct timespec &DispatcherPrivate::getCurrentTime(struct timespec &t)
@@ -241,7 +262,7 @@ int DispatcherPrivate::handleEvent()
     {
         AutoRef<EventBase> evt(m_events.back());
         m_events.pop_back();
-
+        disp_debug("[Dispatcher]: Handling event %i", evt->getType());
 
         EventHandlerMap::const_iterator it = m_evt_hdl.find(evt->getType());
         for (; (it != m_evt_hdl.end()); ++it)
@@ -294,9 +315,18 @@ int DispatcherPrivate::handleTimer()
     return nb;
 }
 
+bool DispatcherPrivate::inDispatcher()
+{
+    Locker l(m_lock);
+    return m_dispatch && (pthread_equal(pthread_self(), m_disp_th));
+}
+
 int DispatcherPrivate::dispatch(int timeout)
 {
     m_lock.lock();
+    m_dispatch = true;
+    m_disp_th = pthread_self();
+
     size_t nfds = 2 + m_fd_hdl.size();
     int rc;
 
@@ -329,10 +359,14 @@ int DispatcherPrivate::dispatch(int timeout)
     {
         int nb = 0;
 
+        disp_debug("[Dispatcher]: Some events to dispatch(%i)", rc);
         if (fds[0].revents != 0) /* we got a manual wake-up */
         {
             uint64_t i;
-            read(m_wakefd, &i, sizeof (i));
+            if (read(m_wakefd, &i, sizeof (i)) <= 0)
+            {
+                log_warning("[Dispatcher]: Something went wrong with eventfd");
+            }
 
             nb += handleEvent();
             --rc;
@@ -340,7 +374,10 @@ int DispatcherPrivate::dispatch(int timeout)
         if (fds[1].revents != 0) /* there's a timer */
         {
             uint64_t i;
-            read(m_timerfd, &i, sizeof (i));
+            if (read(m_timerfd, &i, sizeof (i)) <= 0)
+            {
+                log_warning("[Dispatcher]: Something went wrong with timerfd");
+            }
 
             nb += handleTimer();
             --rc;
@@ -358,13 +395,19 @@ int DispatcherPrivate::dispatch(int timeout)
                 ++nb;
             }
         }
-        return nb;
+        rc = nb;
     }
     else if (rc == 0)
-        return -1;
+        rc = -1;
     else if (rc == EINTR)
-        return -2;
+        rc = -2;
     else
-        return -3;
+        rc = -3;
+
+    m_lock.lock();
+    m_dispatch = false;
+    m_lock.unlock();
+
+    return rc;
 }
 

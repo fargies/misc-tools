@@ -17,30 +17,63 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** TimerHandler.hh
+** Singleton.hh
 **
-**        Created on: Nov 11, 2012
-**   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
+**        Created on: Nov 12, 2012
+**   Original Author: Sylvain Fargier <fargier.sylvain@free.fr>
 **
 */
 
-#ifndef __TIMER_HANDLER_HH__
-#define __TIMER_HANDLER_HH__
+#ifndef __SINGLETON_HH__
+#define __SINGLETON_HH__
 
-namespace notifier {
+#include "threading/Mutex.hh"
 
-class TimerHandler
+/**
+ * @brief singleton creation mutex.
+ *
+ */
+class SingletonMutex
 {
 public:
-    virtual ~TimerHandler();
+    SingletonMutex();
+    ~SingletonMutex();
 
-    /**
-     * @return true to restart the timer, false to stop it.
-     */
-    virtual bool handle() = 0;
+protected:
+    static threading::Mutex m_lock;
 };
 
-}
+template <class C>
+class Singleton
+{
+public:
+    static C &instance()
+    {
+        if (!m_instance)
+        {
+            SingletonMutex lock;
+            if (!m_instance)
+                m_instance = new C();
+        }
+        return *m_instance;
+    }
+
+    static void destroy()
+    {
+        SingletonMutex lock;
+        if (m_instance)
+        {
+            delete m_instance;
+            m_instance = NULL;
+        }
+    }
+
+protected:
+    static C *m_instance;
+};
+
+template <class C>
+C *Singleton<C>::m_instance = NULL;
 
 #endif
 

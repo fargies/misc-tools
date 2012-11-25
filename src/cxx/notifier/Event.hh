@@ -27,7 +27,9 @@
 #ifndef __EVENT_HH__
 #define __EVENT_HH__
 
-#include "refCounter.hh"
+#include "RefCounter.hh"
+
+namespace notifier {
 
 class EventBase : public RefCounter
 {
@@ -55,6 +57,8 @@ int createType();
 
 template <class C>
 const int Event<C>::s_type = createType();
+
+}
 
 #endif
 

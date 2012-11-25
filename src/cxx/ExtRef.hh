@@ -71,7 +71,8 @@ public:
         if (--(*m_cnt) == 0)
         {
             delete m_cnt;
-            delete m_ptr;
+            if (m_ptr)
+                delete m_ptr;
         }
     }
 

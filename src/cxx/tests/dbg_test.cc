@@ -32,6 +32,8 @@
 
 #include "dbg.hh"
 
+     #define xstr(s) str(s)
+     #define str(s) #s
 class TestDbg : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestDbg);
@@ -49,6 +51,8 @@ public:
       DBG << 'c';
       DBG << true << " != " << false;
       DBG << '0' << " < " << '1';
+      DBG << " < -- > " << xstr(sizeof (int));
+      DBG << " < -- > " << str(sizeof (int));
 
 #ifdef DEBUG_STL
       std::map<int, std::string> m;

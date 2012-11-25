@@ -27,8 +27,8 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
 
-#include "refCounter.hh"
-#include "autoRef.hh"
+#include "RefCounter.hh"
+#include "AutoRef.hh"
 
 class RefCountedObject : public RefCounter
 {

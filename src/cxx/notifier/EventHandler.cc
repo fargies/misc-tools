@@ -26,6 +26,8 @@
 
 #include "EventHandler.hh"
 
+using namespace notifier;
+
 EventHandler::~EventHandler()
 {}
 

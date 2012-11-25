@@ -17,35 +17,32 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker.hh
+** Logger.hh
 **
-**        Created on: Apr 06, 2012
-**   Original Author: fargie_s
+**        Created on: Nov 25, 2012
+**   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
 
-#ifndef __LOCKER_HH__
-#define __LOCKER_HH__
+#ifndef __LOGGER_HH__
+#define __LOGGER_HH__
 
-class Mutex;
+#include <stdio.h>
 
-class Locker
-{
-public:
-    Locker(Mutex &m);
-    ~Locker();
+#define log_error(...) do { printf(__VA_ARGS__); printf("\n"); } while (0);
+#define log_warning(...) do { printf(__VA_ARGS__); printf("\n"); } while (0);
+#define log_notice(...) do { printf(__VA_ARGS__); printf("\n"); } while (0);
+#define log_info(...) do { printf(__VA_ARGS__); printf("\n"); } while (0);
+#define log_debug(...) do { printf(__VA_ARGS__); printf("\n"); } while (0);
 
-    inline Mutex &mutex() const
-    {
-        return m_mutex;
-    }
+namespace log {
 
-private:
-    Locker(const Locker &);
-    Locker &operator =(const Locker &);
 
-    Mutex &m_mutex;
-};
+void log(int priority, const char *format, ...);
+
+void debug(const char *);
+
+}
 
 #endif
 

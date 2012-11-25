@@ -27,7 +27,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
 
-#include "autoPtr.hh"
+#include "AutoPtr.hh"
 
 class TestAutoPtrObject
 {

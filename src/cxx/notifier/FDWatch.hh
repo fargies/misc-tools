@@ -27,6 +27,8 @@
 #ifndef __FDWATCH_HH__
 #define __FDWATCH_HH__
 
+namespace notifier {
+
 class FDWatch
 {
 public:
@@ -39,6 +41,8 @@ public:
 
     virtual void handle(int fd) = 0;
 };
+
+}
 
 #endif
 

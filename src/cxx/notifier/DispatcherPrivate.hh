@@ -33,13 +33,15 @@
 #include <set>
 #include <deque>
 
-#include "autoPtr.hh"
-#include "refCounter.hh"
-#include "threading/cond.hh"
+#include "AutoPtr.hh"
+#include "RefCounter.hh"
+#include "threading/Cond.hh"
 
 #include "Dispatcher.hh"
 #include "Event.hh"
 #include "Timer.hh"
+
+namespace notifier {
 
 struct FDWatchDesc
 {
@@ -88,10 +90,12 @@ public:
      */
     struct timespec &getCurrentTime(struct timespec &ts);
 
-    inline Cond &getTimerLock()
+    inline threading::Cond &getTimerLock()
     {
         return m_timers_lock;
     }
+
+    bool inDispatcher();
 
 protected:
     void setNextTimer(const struct timespec &ts);
@@ -111,15 +115,18 @@ protected:
     TimerList m_timers;
     AutoRef<TimerPrivate> m_curr_timer;
 
-    Mutex m_lock;
-    Cond m_timers_lock;
+    threading::Mutex m_lock;
+    threading::Cond m_timers_lock;
 
     int m_wakefd;
     int m_timerfd;
+    bool m_dispatch;
+    pthread_t m_disp_th;
 
     friend class Dispatcher;
 };
 
+}
 
 #endif
 

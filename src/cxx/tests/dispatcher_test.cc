@@ -30,6 +30,8 @@
 #include "notifier/Dispatcher.hh"
 #include "notifier/Event.hh"
 
+using namespace notifier;
+
 class TestEvent : public Event<TestEvent>
 {
 public:

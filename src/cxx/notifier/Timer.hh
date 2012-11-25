@@ -30,7 +30,9 @@
 #include <stdint.h>
 
 #include "TimerHandler.hh"
-#include "autoRef.hh"
+#include "AutoRef.hh"
+
+namespace notifier {
 
 class Dispatcher;
 class TimerPrivate;
@@ -95,6 +97,8 @@ protected:
     AutoRef<TimerPrivate> m_ptimer;
     Dispatcher &m_disp;
 };
+
+}
 
 #endif
 

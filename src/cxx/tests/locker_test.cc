@@ -27,8 +27,10 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
 
-#include "threading/mutex.hh"
-#include "threading/locker.hh"
+#include "threading/Mutex.hh"
+#include "threading/Locker.hh"
+
+using namespace threading;
 
 class TestLocker : public CppUnit::TestFixture
 {

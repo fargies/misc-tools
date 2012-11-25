@@ -26,11 +26,11 @@
 
 #include <errno.h>
 #include <signal.h>
-#include "thread.hh"
+#include "Thread.hh"
 
 #ifdef THREAD_SAFE
 
-#include "locker.hh"
+#include "Locker.hh"
 
 #define TCOND_LOCKER(cond) Locker l ## __LINE__(cond)
 #define TCOND_BROADCAST(cond) cond.broadcast()
@@ -40,6 +40,8 @@
 #define TCOND_BROADCAST(cond) do {} while (0)
 #define TCOND_WAIT(cond) do {} while (0)
 #endif
+
+using namespace threading;
 
 Thread::Thread() :
     m_thread_state(STOPPED)
@@ -93,7 +95,7 @@ int Thread::join()
                 return 0;
             else if (m_thread_state != ZOMBI)
                 return -1; // should never happen
-            /* continue with ZOMBI */
+            /* continue with zombi */
         case ZOMBI:
             {
                 void *value_ptr;
@@ -107,6 +109,7 @@ int Thread::join()
         case STOPPED:
             return ESRCH;
     };
+    return -1;
 }
 
 int Thread::detach()
@@ -136,6 +139,7 @@ int Thread::detach()
         case STOPPED:
             return ESRCH;
     };
+    return -1;
 }
 
 int Thread::kill(int sig)

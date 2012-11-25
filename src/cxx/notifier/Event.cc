@@ -26,6 +26,8 @@
 
 #include "Event.hh"
 
+namespace notifier {
+
 EventBase::~EventBase()
 {}
 
@@ -33,5 +35,7 @@ int createType()
 {
     static int N = 0;
     return N++;
+}
+
 }
 

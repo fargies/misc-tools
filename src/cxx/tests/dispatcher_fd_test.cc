@@ -36,6 +36,7 @@
 #include "notifier/FDWatch.hh"
 
 using namespace std;
+using namespace notifier;
 
 class Pipe : public FDWatch
 {

@@ -27,6 +27,8 @@
 #ifndef __EVENT_HANDLER_HH__
 #define __EVENT_HANDLER_HH__
 
+namespace notifier {
+
 class EventBase;
 
 class EventHandler
@@ -36,6 +38,8 @@ public:
 
     virtual void handle(EventBase &ev) = 0;
 };
+
+}
 
 #endif
 

@@ -17,63 +17,39 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** thread.hh
+** Locker.hh
 **
-**        Created on: Apr 08, 2012
+**        Created on: Apr 06, 2012
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __THREAD_HH__
-#define __THREAD_HH__
+#ifndef __LOCKER_HH__
+#define __LOCKER_HH__
 
-#include <pthread.h>
+namespace threading {
 
-#define THREAD_SAFE
+class Mutex;
 
-#ifdef THREAD_SAFE
-#include "cond.hh"
-#endif
-
-class Thread
+class Locker
 {
 public:
-    typedef enum {
-        STOPPED,
-        RUNNING,
-        DETACHED,
-        ZOMBI
-    } State;
+    Locker(Mutex &m);
+    ~Locker();
 
-    Thread();
-    virtual ~Thread();
-
-    int start();
-
-    int join();
-
-    int detach();
-
-    State state() const;
-
-    /**
-     * @brief send a signal to the running thread.
-     * @details calls pthread_kill.
-     */
-    int kill(int);
-
-protected:
-    virtual void thread_routine() = 0;
+    inline Mutex &mutex() const
+    {
+        return m_mutex;
+    }
 
 private:
-    pthread_t m_thread_id;
-#ifdef THREAD_SAFE
-    mutable Cond m_thread_cond;
-#endif
-    State m_thread_state;
+    Locker(const Locker &);
+    Locker &operator =(const Locker &);
 
-    static void *thread_routine_wrapper(void *data);
+    Mutex &m_mutex;
 };
+
+}
 
 #endif
 

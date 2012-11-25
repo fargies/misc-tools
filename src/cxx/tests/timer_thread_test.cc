@@ -29,8 +29,11 @@
 
 #include "notifier/Dispatcher.hh"
 #include "notifier/Timer.hh"
-#include "threading/thread.hh"
-#include "threading/cond.hh"
+#include "threading/Thread.hh"
+#include "threading/Cond.hh"
+
+using namespace threading;
+using namespace notifier;
 
 /*
  * Simple threaded dispatcher used in the test

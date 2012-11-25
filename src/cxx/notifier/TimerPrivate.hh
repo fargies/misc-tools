@@ -31,6 +31,8 @@
 
 #include "DispatcherPrivate.hh"
 
+namespace notifier {
+
 class Timer;
 
 class TimerPrivate : public RefCounter
@@ -77,6 +79,8 @@ protected:
 
     friend class DispatcherPrivate;
 };
+
+}
 
 #endif
 

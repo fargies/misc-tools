@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,41 +17,41 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** mutex.hh
+** Cond.hh
 **
-**        Created on: Nov 13, 2011
+**        Created on: Apr 06, 2012
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __MUTEX_HH__
-#define __MUTEX_HH__
+#ifndef __COND_HH__
+#define __COND_HH__
 
 #include <pthread.h>
+#include "Mutex.hh"
 
-#ifdef NDEBUG
-#define DEFAULT_MUTEX_TYPE PTHREAD_MUTEX_DEFAULT
-#else
-#define DEFAULT_MUTEX_TYPE PTHREAD_MUTEX_ERRORCHECK
-#endif
+namespace threading {
 
-class Mutex
+class Cond : public Mutex
 {
 public:
-    Mutex(int type = DEFAULT_MUTEX_TYPE);
-    ~Mutex();
+    Cond();
+    ~Cond();
 
-    void lock();
-    bool trylock();
-    void unlock();
+    void wait();
+    int timedWait(int timeout);
+    void signal();
+    void broadcast();
 
 protected:
-    pthread_mutex_t m_mutex;
+    pthread_cond_t m_cond;
 
 private:
-    Mutex(const Mutex &);
-    Mutex &operator =(const Mutex &);
+    Cond(const Cond &);
+    Cond &operator =(const Cond &);
 };
+
+}
 
 #endif
 

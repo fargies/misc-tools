@@ -27,7 +27,9 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
 
-#include "threading/mutex.hh"
+#include "threading/Mutex.hh"
+
+using namespace threading;
 
 class TestMutex : public CppUnit::TestFixture
 {
