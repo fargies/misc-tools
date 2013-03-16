@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Sylvain Fargier <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,41 +17,39 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** refCounter.hh
 **
-**        Created on: Apr 08, 2012
-**   Original Author: fargie_s
+**        Created on: May 05, 2011
+**            Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestFixture.h>
+#ifndef REFCOUNTER_HH_
+#define REFCOUNTER_HH_
 
-#include "threading/Mutex.hh"
-#include "threading/Locker.hh"
-
-using namespace threading;
-
-class TestLocker : public CppUnit::TestFixture
+/**
+ * @brief Implementation of RefCounter
+ */
+class RefCounter
 {
-    CPPUNIT_TEST_SUITE(TestLocker);
-    CPPUNIT_TEST(simple);
-    CPPUNIT_TEST_SUITE_END();
-
 public:
-    void simple()
-    {
-        Mutex m;
+    int incRef();
 
-        {
-            Locker l(m);
+    /**
+     * @brief decrement refCount
+     *
+     * @details the del parameter is mostly used with RefCounted attributes in a class
+     * @param del whether the object should be deleted when the refCount reaches 0
+     * @return current refCount
+     */
+    int decRef(bool del = true);
+    int getNumRef() const; //< Test/Debug purpose
 
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-    }
+protected:
+    int m_numRef;
 
+    RefCounter();
+    virtual ~RefCounter();
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);
+#endif /*REFCOUNTER_HH_*/

@@ -17,41 +17,25 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** Event.cc
 **
-**        Created on: Apr 08, 2012
-**   Original Author: fargie_s
+**        Created on: Nov 09, 2012
+**   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestFixture.h>
+#include "Event.hh"
 
-#include "threading/Mutex.hh"
-#include "threading/Locker.hh"
+namespace notifier {
 
-using namespace threading;
+EventBase::~EventBase()
+{}
 
-class TestLocker : public CppUnit::TestFixture
+int createType()
 {
-    CPPUNIT_TEST_SUITE(TestLocker);
-    CPPUNIT_TEST(simple);
-    CPPUNIT_TEST_SUITE_END();
+    static int N = 0;
+    return N++;
+}
 
-public:
-    void simple()
-    {
-        Mutex m;
+}
 
-        {
-            Locker l(m);
-
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-    }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);

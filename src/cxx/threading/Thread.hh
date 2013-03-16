@@ -17,41 +17,67 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** Thread.hh
 **
 **        Created on: Apr 08, 2012
 **   Original Author: fargie_s
 **
 */
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestFixture.h>
+#ifndef __THREAD_HH__
+#define __THREAD_HH__
 
-#include "threading/Mutex.hh"
-#include "threading/Locker.hh"
+#include <pthread.h>
 
-using namespace threading;
+#define THREAD_SAFE
 
-class TestLocker : public CppUnit::TestFixture
+#ifdef THREAD_SAFE
+#include "Cond.hh"
+#endif
+
+namespace threading {
+
+class Thread
 {
-    CPPUNIT_TEST_SUITE(TestLocker);
-    CPPUNIT_TEST(simple);
-    CPPUNIT_TEST_SUITE_END();
-
 public:
-    void simple()
-    {
-        Mutex m;
+    typedef enum {
+        STOPPED,
+        RUNNING,
+        DETACHED,
+        ZOMBI
+    } State;
 
-        {
-            Locker l(m);
+    Thread();
+    virtual ~Thread();
 
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-    }
+    int start();
 
+    int join();
+
+    int detach();
+
+    State state() const;
+
+    /**
+     * @brief send a signal to the running thread.
+     * @details calls pthread_kill.
+     */
+    int kill(int);
+
+protected:
+    virtual void thread_routine() = 0;
+
+private:
+    pthread_t m_thread_id;
+#ifdef THREAD_SAFE
+    mutable Cond m_thread_cond;
+#endif
+    State m_thread_state;
+
+    static void *thread_routine_wrapper(void *data);
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);
+}
+
+#endif
+

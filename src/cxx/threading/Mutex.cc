@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2011 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,77 +17,74 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** cond.cc
+** mutex.cc
 **
-**        Created on: Apr 06, 2012
+**        Created on: Nov 13, 2011
 **   Original Author: fargie_s
 **
 */
 
-#include <time.h>
-#include "cond.hh"
+#include <errno.h>
+
+#include "Mutex.hh"
 
 #ifdef NDEBUG
 #define CHECK_EQ0(cmd) cmd
 #else
-
 #include <stdio.h>
-#include <errno.h>
 #include <assert.h>
 #include <string.h>
 
 #define CHECK_EQ0(cmd) { \
-    int rc = (cmd); \
-    if (rc != 0) { \
+    int RC = (cmd); \
+    if (RC != 0) { \
         fprintf(stderr, "%s:%i cmd:%s failed rc:%i:%s\n", \
-                __FILE__, __LINE__, #cmd, rc, strerror(rc)); \
+                __FILE__, __LINE__, #cmd, RC, strerror(RC)); \
         assert(0); \
     } \
 }
 #endif
 
-Cond::Cond() :
-    Mutex()
+using namespace threading;
+
+Mutex::Mutex(int type)
 {
-    CHECK_EQ0(pthread_cond_init(&m_cond, NULL));
+    pthread_mutexattr_t attrs;
+    CHECK_EQ0(pthread_mutexattr_init(&attrs));
+    CHECK_EQ0(pthread_mutexattr_settype(&attrs, type));
+
+    CHECK_EQ0(pthread_mutex_init(&m_mutex, &attrs));
+
+    CHECK_EQ0(pthread_mutexattr_destroy(&attrs));
 }
 
-Cond::~Cond()
+Mutex::~Mutex()
 {
-    CHECK_EQ0(pthread_cond_destroy(&m_cond));
+    CHECK_EQ0(pthread_mutex_destroy(&m_mutex));
 }
 
-void Cond::wait()
+bool Mutex::trylock()
 {
-    CHECK_EQ0(pthread_cond_wait(&m_cond, &m_mutex));
-}
+    int rc = pthread_mutex_trylock(&m_mutex);
 
-int Cond::timedWait(int timeout)
-{
-    timespec t;
-
-    CHECK_EQ0(clock_gettime(CLOCK_REALTIME, &t));
-
-    unsigned long nsec = (timeout % 1000) * (1000 * 1000) + t.tv_nsec;
-    t.tv_sec += timeout / 1000;
-
-    if (nsec >= 1000000000)
+    if (rc == 0)
+        return true;
+    else if (rc == EBUSY)
+        return false;
+    else
     {
-        t.tv_sec += 1;
-        nsec -= 1000000000;
+        CHECK_EQ0(rc);
+        return false;
     }
-    t.tv_nsec = nsec;
-
-    return pthread_cond_timedwait(&m_cond, &m_mutex, &t);
 }
 
-void Cond::signal()
+void Mutex::lock()
 {
-    CHECK_EQ0(pthread_cond_signal(&m_cond));
+    CHECK_EQ0(pthread_mutex_lock(&m_mutex));
 }
 
-void Cond::broadcast()
+void Mutex::unlock()
 {
-    CHECK_EQ0(pthread_cond_broadcast(&m_cond));
+    CHECK_EQ0(pthread_mutex_unlock(&m_mutex));
 }
 

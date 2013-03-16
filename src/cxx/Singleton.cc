@@ -17,41 +17,24 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** Singleton.cc
 **
-**        Created on: Apr 08, 2012
-**   Original Author: fargie_s
+**        Created on: Nov 12, 2012
+**   Original Author: Sylvain Fargier <fargier.sylvain@free.fr>
 **
 */
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestFixture.h>
+#include "Singleton.hh"
 
-#include "threading/Mutex.hh"
-#include "threading/Locker.hh"
+threading::Mutex SingletonMutex::m_lock(PTHREAD_MUTEX_RECURSIVE);
 
-using namespace threading;
-
-class TestLocker : public CppUnit::TestFixture
+SingletonMutex::SingletonMutex()
 {
-    CPPUNIT_TEST_SUITE(TestLocker);
-    CPPUNIT_TEST(simple);
-    CPPUNIT_TEST_SUITE_END();
+    m_lock.lock();
+}
 
-public:
-    void simple()
-    {
-        Mutex m;
+SingletonMutex::~SingletonMutex()
+{
+    m_lock.unlock();
+}
 
-        {
-            Locker l(m);
-
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-    }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);

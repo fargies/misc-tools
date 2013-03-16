@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Sylvain Fargier <sylvain.fargier@somfy.com>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,37 +17,48 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** cond.hh
+** utils.h
 **
-**        Created on: Apr 06, 2012
-**   Original Author: fargie_s
+**        Created on: Aug 04, 2012
+**   Original Author: Sylvain Fargier <fargier.sylvain@free.fr>
 **
 */
 
-#ifndef __COND_HH__
-#define __COND_HH__
+#ifndef __UTILS_H__
+#define __UTILS_H__
 
-#include <pthread.h>
-#include "mutex.hh"
+#ifndef XSTR
+#define XSTR(s) STR(s)
+#define STR(s) #s
+#endif
 
-class Cond : public Mutex
-{
-public:
-    Cond();
-    ~Cond();
+#ifndef UNUSED
+#if defined(__GNUC__)
+#define UNUSED(a) a __attribute__ ((unused))
+#else
+#define UNUSED(a) a
+#endif
 
-    void wait();
-    int timedWait(int timeout);
-    void signal();
-    void broadcast();
+#if defined(__cplusplus)
 
-protected:
-    pthread_cond_t m_cond;
+#ifndef NDEBUG
 
-private:
-    Cond(const Cond &);
-    Cond &operator =(const Cond &);
-};
+/* From: Modern C++ Design */
+template<int> struct CompileTimeChecker;
+template<> struct CompileTimeChecker<true> {};
+#define STATIC_CHECK(expr, msg) \
+{ \
+        CompileTimeChecker<((expr) != 0)> ERROR_##msg; \
+        (void)ERROR_##msg; \
+}
+
+#else
+
+#define STATIC_CHECK(expr, msg) do { } while(0)
+
+#endif
+
+#endif
 
 #endif
 

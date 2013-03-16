@@ -28,7 +28,9 @@
 #include <cppunit/TestFixture.h>
 #include <errno.h>
 
-#include "threading/thread.hh"
+#include "threading/Thread.hh"
+
+using namespace threading;
 
 class SimpleThread : public Thread
 {
@@ -55,6 +57,7 @@ class TestThread : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(TestThread);
     CPPUNIT_TEST(simple);
+    CPPUNIT_TEST(deadlock);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -63,6 +66,24 @@ public:
         SimpleThread s;
 
         CPPUNIT_ASSERT_EQUAL(0, s.start());
+
+        CPPUNIT_ASSERT_EQUAL(0, s.join());
+        CPPUNIT_ASSERT(s.called());
+
+        CPPUNIT_ASSERT_EQUAL(ESRCH, s.join());
+    }
+
+    /*
+     * There used to be a deadlock if the started thread finished before we
+     * call join
+     */
+    void deadlock()
+    {
+        SimpleThread s;
+
+        CPPUNIT_ASSERT_EQUAL(0, s.start());
+        while (!s.called() && (s.state() != Thread::ZOMBI))
+            pthread_yield(); // let the child run and die now
 
         CPPUNIT_ASSERT_EQUAL(0, s.join());
         CPPUNIT_ASSERT(s.called());

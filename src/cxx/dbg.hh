@@ -113,8 +113,8 @@ public:
     Debug &operator <<(const DataFmt &);
 
 protected:
-    void puts(const char *);
-    void putc(char);
+    void put(const char *);
+    void put(char);
     void flush();
 #endif
 
@@ -138,52 +138,92 @@ typedef Debug::DataFmt Data;
 
 #include <string>
 #include <list>
+#include <vector>
 #include <map>
 
 template <typename T>
 Debug &operator <<(Debug &d, const std::list<T> &l)
 {
-    d << "[ " << Debug::INDENT << Debug::NL;
+    d << "[" << Debug::INDENT;
 
+    bool more = (l.size() > 1);
     bool first = true;
     for (typename std::list<T>::const_iterator it = l.begin();
             it != l.end(); ++it)
     {
         if (first)
         {
-            d << *it;
+            if (more)
+                d << Debug::NL << *it;
+            else
+                d << " " << *it;
             first = false;
         }
         else
             d << ", " << Debug::NL << *it;
     }
-    d << " ]" << Debug::OUTDENT << Debug::NL;
+    if (more)
+        d << Debug::OUTDENT << Debug::NL << "]";
+    else
+        d << Debug::OUTDENT << " ]";
     return d;
 }
 
 template <typename K, typename V>
 Debug &operator <<(Debug &d, const std::map<K, V> &m)
 {
-    d << "{ " << Debug::INDENT;
+    d << "{" << Debug::INDENT;
 
+    bool more = (m.size() > 1);
     bool first = true;
     for (typename std::map<K, V>::const_iterator it = m.begin();
             it != m.end(); ++it)
     {
         if (first)
         {
-            d << Debug::NL << it->first << " : " << it->second;
+            if (more)
+                d << Debug::NL << it->first << " : " << it->second;
+            else
+                d << " " << it->first << " : " << it->second;
             first = false;
         }
         else
             d << ", " << Debug::NL <<
                 it->first << " : " << it->second;
     }
-    if (!first) /* the map is not empty */
-        d << Debug::OUTDENT << Debug::NL;
+    if (more)
+        d << Debug::OUTDENT << Debug::NL << "}";
     else
-        d << Debug::OUTDENT;
-    d << "}" << Debug::NL;
+        d << Debug::OUTDENT << " }";
+    return d;
+}
+
+template <typename T>
+Debug &operator <<(Debug &d, const std::vector<T> &v)
+{
+    d << "{" << Debug::INDENT;
+
+    bool more = (v.size() > 1);
+    bool first = true;
+    for (typename std::vector<T>::const_iterator it = v.begin();
+            it != v.end(); ++it)
+    {
+        if (first)
+        {
+            if (more)
+                d << Debug::NL << *it;
+            else
+                d << " " << *it;
+            first = false;
+        }
+        else
+            d << ", " << Debug::NL << *it;
+    }
+
+    if (more)
+        d << Debug::OUTDENT << Debug::NL << "}";
+    else
+        d << Debug::OUTDENT << " }";
     return d;
 }
 

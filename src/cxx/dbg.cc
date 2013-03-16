@@ -43,7 +43,7 @@ Debug &Debug::operator <<(Debug::DebugMod m)
     switch (m)
     {
         case NL:
-            putc('\n');
+            //put('\n');
             flush();
             break;
         case INDENT:
@@ -59,16 +59,16 @@ Debug &Debug::operator <<(Debug::DebugMod m)
 Debug &Debug::operator <<(const char *str)
 {
     if (str == NULL)
-        puts(DEBUG_NULL_STR);
+        put(DEBUG_NULL_STR);
     else
-        puts(str);
+        put(str);
     return *this;
 }
 
 Debug &Debug::operator <<(const Quoted &f)
 {
     if (!f.m_str)
-        puts(DEBUG_NULL_STR);
+        put(DEBUG_NULL_STR);
     else
     {
         const char *str = f.m_str;
@@ -134,7 +134,7 @@ Debug &Debug::operator <<(char c)
 
 Debug &Debug::operator <<(bool b)
 {
-    (b) ? puts(DEBUG_TRUE_STR) : puts(DEBUG_FALSE_STR);
+    (b) ? put(DEBUG_TRUE_STR) : put(DEBUG_FALSE_STR);
     return *this;
 }
 
@@ -194,7 +194,7 @@ Debug &Debug::operator <<(const DataFmt &f)
     return *this;
 }
 
-void Debug::puts(const char *str)
+void Debug::put(const char *str)
 {
     if (m_pos && (m_pos + strlen(str)) > DEBUG_BUFF_SIZE)
         flush();
@@ -203,7 +203,7 @@ void Debug::puts(const char *str)
         buffer[m_pos++] = *(str++);
 }
 
-void Debug::putc(char c)
+void Debug::put(char c)
 {
     if (m_pos == DEBUG_BUFF_SIZE)
         flush();

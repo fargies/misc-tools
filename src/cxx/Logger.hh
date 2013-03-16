@@ -17,41 +17,32 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** Logger.hh
 **
-**        Created on: Apr 08, 2012
-**   Original Author: fargie_s
+**        Created on: Nov 25, 2012
+**   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestFixture.h>
+#ifndef __LOGGER_HH__
+#define __LOGGER_HH__
 
-#include "threading/Mutex.hh"
-#include "threading/Locker.hh"
+#include <stdio.h>
 
-using namespace threading;
+#define log_error(...) do { printf(__VA_ARGS__); printf("\n"); } while (0);
+#define log_warning(...) do { printf(__VA_ARGS__); printf("\n"); } while (0);
+#define log_notice(...) do { printf(__VA_ARGS__); printf("\n"); } while (0);
+#define log_info(...) do { printf(__VA_ARGS__); printf("\n"); } while (0);
+#define log_debug(...) do { printf(__VA_ARGS__); printf("\n"); } while (0);
 
-class TestLocker : public CppUnit::TestFixture
-{
-    CPPUNIT_TEST_SUITE(TestLocker);
-    CPPUNIT_TEST(simple);
-    CPPUNIT_TEST_SUITE_END();
+namespace log {
 
-public:
-    void simple()
-    {
-        Mutex m;
 
-        {
-            Locker l(m);
+void log(int priority, const char *format, ...);
 
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-    }
+void debug(const char *);
 
-};
+}
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);
+#endif
+

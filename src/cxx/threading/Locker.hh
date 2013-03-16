@@ -17,7 +17,7 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker.hh
+** Locker.hh
 **
 **        Created on: Apr 06, 2012
 **   Original Author: fargie_s
@@ -26,6 +26,8 @@
 
 #ifndef __LOCKER_HH__
 #define __LOCKER_HH__
+
+namespace threading {
 
 class Mutex;
 
@@ -46,6 +48,8 @@ private:
 
     Mutex &m_mutex;
 };
+
+}
 
 #endif
 

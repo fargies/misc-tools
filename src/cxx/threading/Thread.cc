@@ -26,11 +26,11 @@
 
 #include <errno.h>
 #include <signal.h>
-#include "thread.hh"
+#include "Thread.hh"
 
 #ifdef THREAD_SAFE
 
-#include "locker.hh"
+#include "Locker.hh"
 
 #define TCOND_LOCKER(cond) Locker l ## __LINE__(cond)
 #define TCOND_BROADCAST(cond) cond.broadcast()
@@ -40,6 +40,8 @@
 #define TCOND_BROADCAST(cond) do {} while (0)
 #define TCOND_WAIT(cond) do {} while (0)
 #endif
+
+using namespace threading;
 
 Thread::Thread() :
     m_thread_state(STOPPED)
@@ -59,6 +61,8 @@ void *Thread::thread_routine_wrapper(void *data)
     TCOND_LOCKER(thread->m_thread_cond);
     if (thread->m_thread_state == DETACHED)
         thread->m_thread_state = STOPPED;
+    else
+        thread->m_thread_state = ZOMBI;
     TCOND_BROADCAST(thread->m_thread_cond);
 
     pthread_exit(0);
@@ -85,18 +89,19 @@ int Thread::join()
     switch (m_thread_state)
     {
         case RUNNING:
+            TCOND_WAIT(m_thread_cond);
+
+            if (m_thread_state == STOPPED)
+                return 0;
+            else if (m_thread_state != ZOMBI)
+                return -1; // should never happen
+            /* continue with zombi */
+        case ZOMBI:
             {
-                TCOND_WAIT(m_thread_cond);
+                void *value_ptr;
+                int rc = pthread_join(m_thread_id, &value_ptr);
 
-                int rc = 0;
-
-                if (m_thread_state == RUNNING)
-                {
-                    void *value_ptr;
-                    rc = pthread_join(m_thread_id, &value_ptr);
-                }
                 m_thread_state = STOPPED;
-
                 return rc;
             }
         case DETACHED:
@@ -104,6 +109,7 @@ int Thread::join()
         case STOPPED:
             return ESRCH;
     };
+    return -1;
 }
 
 int Thread::detach()
@@ -120,11 +126,20 @@ int Thread::detach()
 
                 return rc;
             }
+        case ZOMBI:
+            {
+                void *value_ptr;
+                int rc = pthread_join(m_thread_id, &value_ptr);
+
+                m_thread_state = STOPPED;
+                return rc;
+            }
         case DETACHED:
             return EINVAL;
         case STOPPED:
             return ESRCH;
     };
+    return -1;
 }
 
 int Thread::kill(int sig)

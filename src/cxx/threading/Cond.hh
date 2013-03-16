@@ -17,41 +17,41 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** Cond.hh
 **
-**        Created on: Apr 08, 2012
+**        Created on: Apr 06, 2012
 **   Original Author: fargie_s
 **
 */
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestFixture.h>
+#ifndef __COND_HH__
+#define __COND_HH__
 
-#include "threading/Mutex.hh"
-#include "threading/Locker.hh"
+#include <pthread.h>
+#include "Mutex.hh"
 
-using namespace threading;
+namespace threading {
 
-class TestLocker : public CppUnit::TestFixture
+class Cond : public Mutex
 {
-    CPPUNIT_TEST_SUITE(TestLocker);
-    CPPUNIT_TEST(simple);
-    CPPUNIT_TEST_SUITE_END();
-
 public:
-    void simple()
-    {
-        Mutex m;
+    Cond();
+    ~Cond();
 
-        {
-            Locker l(m);
+    void wait();
+    int timedWait(int timeout);
+    void signal();
+    void broadcast();
 
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-    }
+protected:
+    pthread_cond_t m_cond;
 
+private:
+    Cond(const Cond &);
+    Cond &operator =(const Cond &);
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);
+}
+
+#endif
+

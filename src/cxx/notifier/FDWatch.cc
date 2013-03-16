@@ -17,41 +17,17 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** FDWatch.cc
 **
-**        Created on: Apr 08, 2012
-**   Original Author: fargie_s
+**        Created on: Nov 10, 2012
+**   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestFixture.h>
+#include "FDWatch.hh"
 
-#include "threading/Mutex.hh"
-#include "threading/Locker.hh"
+using namespace notifier;
 
-using namespace threading;
+FDWatch::~FDWatch()
+{}
 
-class TestLocker : public CppUnit::TestFixture
-{
-    CPPUNIT_TEST_SUITE(TestLocker);
-    CPPUNIT_TEST(simple);
-    CPPUNIT_TEST_SUITE_END();
-
-public:
-    void simple()
-    {
-        Mutex m;
-
-        {
-            Locker l(m);
-
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-    }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);

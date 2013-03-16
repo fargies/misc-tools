@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2011 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,62 +17,45 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** thread.hh
+** Mutex.hh
 **
-**        Created on: Apr 08, 2012
+**        Created on: Nov 13, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __THREAD_HH__
-#define __THREAD_HH__
+#ifndef __MUTEX_HH__
+#define __MUTEX_HH__
 
 #include <pthread.h>
 
-#define THREAD_SAFE
-
-#ifdef THREAD_SAFE
-#include "cond.hh"
+#ifdef NDEBUG
+#define DEFAULT_MUTEX_TYPE PTHREAD_MUTEX_DEFAULT
+#else
+#define DEFAULT_MUTEX_TYPE PTHREAD_MUTEX_ERRORCHECK
 #endif
 
-class Thread
+namespace threading {
+
+class Mutex
 {
 public:
-    typedef enum {
-        STOPPED,
-        RUNNING,
-        DETACHED
-    } State;
+    Mutex(int type = DEFAULT_MUTEX_TYPE);
+    ~Mutex();
 
-    Thread();
-    virtual ~Thread();
-
-    int start();
-
-    int join();
-
-    int detach();
-
-    State state() const;
-
-    /**
-     * @brief send a signal to the running thread.
-     * @details calls pthread_kill.
-     */
-    int kill(int);
+    void lock();
+    bool trylock();
+    void unlock();
 
 protected:
-    virtual void thread_routine() = 0;
+    pthread_mutex_t m_mutex;
 
 private:
-    pthread_t m_thread_id;
-#ifdef THREAD_SAFE
-    mutable Cond m_thread_cond;
-#endif
-    State m_thread_state;
-
-    static void *thread_routine_wrapper(void *data);
+    Mutex(const Mutex &);
+    Mutex &operator =(const Mutex &);
 };
+
+}
 
 #endif
 

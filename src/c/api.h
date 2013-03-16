@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Fargier Sylvain <sfargier@wyplay.com>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,41 +17,46 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** api.h
 **
-**        Created on: Apr 08, 2012
-**   Original Author: fargie_s
+**        Created on: Apr 11, 2012
+**   Original Author: sfargier
 **
 */
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestFixture.h>
+#ifndef __API_H__
+#define __API_H__
 
-#include "threading/Mutex.hh"
-#include "threading/Locker.hh"
+#define __GNUC_REQ(maj, min) \
+    defined(__GNUC__) && ((__GNUC__ == maj && __GNUC_MINOR__ >= min) || __GNUC__ > maj)
 
-using namespace threading;
+#if __GNUC_REQ(3, 3)
+#define HIDDEN __attribute__ ((visibility("hidden")))
+#define EXPORT __attribute__ ((visibility("default")))
+#define NOTHROW __attribute__ ((__nothrow__))
+#else
+#define HIDDEN
+#define EXPORT
+#define NOTHROW
+#endif
 
-class TestLocker : public CppUnit::TestFixture
-{
-    CPPUNIT_TEST_SUITE(TestLocker);
-    CPPUNIT_TEST(simple);
-    CPPUNIT_TEST_SUITE_END();
+#if __GNUC_REQ(3, 2)
+#define NOTHROW __attribute__ ((__nothrow__))
+#else
+#define NOTHROW
+#endif
 
-public:
-    void simple()
-    {
-        Mutex m;
+#if __GNUC_REQ(2, 96)
+#define PURE __attribute__ ((__pure__))
+#else
+#define PURE
+#endif
 
-        {
-            Locker l(m);
+#if __GNUC_REQ(2, 5)
+#define CONST __attribute__ ((__const__))
+#else
+#define CONST
+#endif
 
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-    }
+#endif
 
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);

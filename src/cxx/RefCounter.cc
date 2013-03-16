@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Sylvain Fargier <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,41 +17,43 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** refcounter.cc
 **
-**        Created on: Apr 08, 2012
-**   Original Author: fargie_s
+**        Created on: Nov 07, 2012
+**   Original Author: Sylvain Fargier <fargier.sylvain@free.fr>
 **
 */
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestFixture.h>
+#include "RefCounter.hh"
+#include <assert.h>
 
-#include "threading/Mutex.hh"
-#include "threading/Locker.hh"
-
-using namespace threading;
-
-class TestLocker : public CppUnit::TestFixture
+int RefCounter::incRef()
 {
-    CPPUNIT_TEST_SUITE(TestLocker);
-    CPPUNIT_TEST(simple);
-    CPPUNIT_TEST_SUITE_END();
+    return ++m_numRef;
+}
 
-public:
-    void simple()
-    {
-        Mutex m;
+int RefCounter::decRef(bool del)
+{
+    int nr = --m_numRef;
+    assert((m_numRef >= 0) && "RefCounter : too much decRef");
+    if (m_numRef < 1 && del)
+        delete this;
+    return nr;
 
-        {
-            Locker l(m);
+}
 
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-    }
+int RefCounter::getNumRef() const
+{
+    return m_numRef;
+}
 
-};
+RefCounter::RefCounter() :
+    m_numRef(0)
+{
+}
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);
+RefCounter::~RefCounter()
+{
+    assert((m_numRef == 0) && "RefCounter : don't manual delete !");
+}
+

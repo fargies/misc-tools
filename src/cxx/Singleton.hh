@@ -17,41 +17,63 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** Singleton.hh
 **
-**        Created on: Apr 08, 2012
-**   Original Author: fargie_s
+**        Created on: Nov 12, 2012
+**   Original Author: Sylvain Fargier <fargier.sylvain@free.fr>
 **
 */
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestFixture.h>
+#ifndef __SINGLETON_HH__
+#define __SINGLETON_HH__
 
 #include "threading/Mutex.hh"
-#include "threading/Locker.hh"
 
-using namespace threading;
-
-class TestLocker : public CppUnit::TestFixture
+/**
+ * @brief singleton creation mutex.
+ *
+ */
+class SingletonMutex
 {
-    CPPUNIT_TEST_SUITE(TestLocker);
-    CPPUNIT_TEST(simple);
-    CPPUNIT_TEST_SUITE_END();
-
 public:
-    void simple()
-    {
-        Mutex m;
+    SingletonMutex();
+    ~SingletonMutex();
 
-        {
-            Locker l(m);
-
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-    }
-
+protected:
+    static threading::Mutex m_lock;
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);
+template <class C>
+class Singleton
+{
+public:
+    static C &instance()
+    {
+        if (!m_instance)
+        {
+            SingletonMutex lock;
+            if (!m_instance)
+                m_instance = new C();
+        }
+        return *m_instance;
+    }
+
+    static void destroy()
+    {
+        SingletonMutex lock;
+        if (m_instance)
+        {
+            delete m_instance;
+            m_instance = NULL;
+        }
+    }
+
+protected:
+    static C *m_instance;
+};
+
+template <class C>
+C *Singleton<C>::m_instance = NULL;
+
+#endif
+

@@ -17,24 +17,30 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker.cc
+** TimerHandler.hh
 **
-**        Created on: Apr 06, 2012
-**   Original Author: fargie_s
+**        Created on: Nov 11, 2012
+**   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
 
-#include "locker.hh"
-#include "mutex.hh"
+#ifndef __TIMER_HANDLER_HH__
+#define __TIMER_HANDLER_HH__
 
-Locker::Locker(Mutex &m) :
-    m_mutex(m)
+namespace notifier {
+
+class TimerHandler
 {
-    m_mutex.lock();
+public:
+    virtual ~TimerHandler();
+
+    /**
+     * @return true to restart the timer, false to stop it.
+     */
+    virtual bool handle() = 0;
+};
+
 }
 
-Locker::~Locker()
-{
-    m_mutex.unlock();
-}
+#endif
 

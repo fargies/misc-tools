@@ -17,41 +17,70 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** extref_test.cc
 **
-**        Created on: Apr 08, 2012
-**   Original Author: fargie_s
+**        Created on: Nov 09, 2012
+**   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
 
-#include "threading/Mutex.hh"
-#include "threading/Locker.hh"
+#include "ExtRef.hh"
 
-using namespace threading;
-
-class TestLocker : public CppUnit::TestFixture
+class ExtRefedObject
 {
-    CPPUNIT_TEST_SUITE(TestLocker);
+public:
+    ExtRefedObject(bool &del) :
+        m_del(del)
+    {
+        m_del = false;
+    }
+
+    ~ExtRefedObject()
+    {
+        m_del = true;
+    }
+
+protected:
+    bool &m_del;
+};
+
+class TestExtRef : public CppUnit::TestFixture
+{
+    CPPUNIT_TEST_SUITE(TestExtRef);
     CPPUNIT_TEST(simple);
+    CPPUNIT_TEST(object);
     CPPUNIT_TEST_SUITE_END();
 
 public:
     void simple()
     {
-        Mutex m;
+        ExtRef<int> r1(new int(12));
 
-        {
-            Locker l(m);
+        CPPUNIT_ASSERT(*r1 == 12);
 
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
+        ExtRef<int> r2 = r1;
+        CPPUNIT_ASSERT(&(*r2) == r1);
+
+        ExtRef<int> r3(r2);
+        CPPUNIT_ASSERT(&(*r3) == r1);
+
+        CPPUNIT_ASSERT(r3.getNumRef() == 3);
+        r3 = r1;
     }
 
+    void object()
+    {
+        bool deleted = true;
+        {
+            ExtRef<ExtRefedObject> r1(new ExtRefedObject(deleted));
+            CPPUNIT_ASSERT(deleted == false);
+        }
+        CPPUNIT_ASSERT(deleted == true);
+    }
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);
+CPPUNIT_TEST_SUITE_REGISTRATION(TestExtRef);
+

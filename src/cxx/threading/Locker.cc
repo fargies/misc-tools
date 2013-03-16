@@ -17,41 +17,26 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** locker_test.cc
+** locker.cc
 **
-**        Created on: Apr 08, 2012
+**        Created on: Apr 06, 2012
 **   Original Author: fargie_s
 **
 */
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestFixture.h>
-
-#include "threading/Mutex.hh"
-#include "threading/Locker.hh"
+#include "Locker.hh"
+#include "Mutex.hh"
 
 using namespace threading;
 
-class TestLocker : public CppUnit::TestFixture
+Locker::Locker(Mutex &m) :
+    m_mutex(m)
 {
-    CPPUNIT_TEST_SUITE(TestLocker);
-    CPPUNIT_TEST(simple);
-    CPPUNIT_TEST_SUITE_END();
+    m_mutex.lock();
+}
 
-public:
-    void simple()
-    {
-        Mutex m;
+Locker::~Locker()
+{
+    m_mutex.unlock();
+}
 
-        {
-            Locker l(m);
-
-            CPPUNIT_ASSERT(!m.trylock());
-        }
-        CPPUNIT_ASSERT(m.trylock());
-        m.unlock();
-    }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLocker);
