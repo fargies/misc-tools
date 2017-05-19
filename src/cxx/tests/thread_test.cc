@@ -28,6 +28,10 @@
 #include <cppunit/TestFixture.h>
 #include <errno.h>
 
+#if defined(__MACH__)
+#include <sched.h>
+#endif
+
 #include "threading/Thread.hh"
 
 using namespace threading;
@@ -83,7 +87,13 @@ public:
 
         CPPUNIT_ASSERT_EQUAL(0, s.start());
         while (!s.called() && (s.state() != Thread::ZOMBI))
+        {
+#if defined(__MACH__)
+            sched_yield();
+#else
             pthread_yield(); // let the child run and die now
+#endif
+        }
 
         CPPUNIT_ASSERT_EQUAL(0, s.join());
         CPPUNIT_ASSERT(s.called());

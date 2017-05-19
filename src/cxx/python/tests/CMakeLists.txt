@@ -8,5 +8,5 @@ set(python_test_SRCS
     PySeq_test.cc)
 
 add_library(python++-tests SHARED ${python_test_SRCS})
-target_link_libraries(python++-tests python++)
+target_link_libraries(python++-tests python++ ${CPPUNIT_LIBRARIES})
 

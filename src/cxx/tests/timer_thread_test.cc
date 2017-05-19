@@ -26,6 +26,7 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
+#include <unistd.h>
 
 #include "notifier/Dispatcher.hh"
 #include "notifier/Timer.hh"

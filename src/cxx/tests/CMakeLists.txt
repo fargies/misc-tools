@@ -8,7 +8,20 @@ pkg_check_modules(CPPUNIT cppunit)
 add_library(testHelper SHARED test_main.cc)
 target_link_libraries(testHelper ${CPPUNIT_LIBRARIES})
 
-file(GLOB test_SRCS *_test.cc)
+set(test_SRCS
+    autoptr_test.cc chrono_test.cc
+    dbg_test.cc extref_test.cc
+    iterator_test.cc
+    key_test.cc locker_test.cc
+    mutex_test.cc refcounter_test.cc
+    thread_test.cc
+    test_main.cc)
+if(NOT APPLE)
+    set(test_SRCS ${test_SRCS} sem_test.cc
+    dispatcher_fd_test.cc dispatcher_test.cc
+    fileLock_test.cc
+    timer_test.cc timer_thread_test.cc)
+endif(NOT APPLE)
 
 add_executable(test_all ${test_SRCS})
 target_link_libraries(test_all testHelper cxx-misc-tools)

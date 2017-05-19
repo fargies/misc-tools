@@ -32,14 +32,23 @@
 #include <time.h>
 #include <stdint.h>
 
+#if defined(__MACH__)
+#include <mach/mach_time.h>
+#endif
+
 class Chrono
 {
 public:
   Chrono();
 
   void clear();
+#if defined(__MACH__) /* OSX support */
+  inline void start() { m_times[0] = mach_absolute_time(); }
+  inline void stop() { m_times[1] = mach_absolute_time(); }
+#else
   inline void start() { clock_gettime(CLOCK_MONOTONIC, &m_times[0]); }
   inline void stop() { clock_gettime(CLOCK_MONOTONIC, &m_times[1]); }
+#endif
 
   uint32_t getMiliSecs() const;
   operator std::string() const;
@@ -47,7 +56,12 @@ public:
   Chrono &operator += (const Chrono &);
 
 protected:
+#if defined __MACH__
+  uint64_t m_times[2]; /* in absolute unit */
+  mach_timebase_info_data_t m_info;
+#else
   struct timespec m_times[2];
+#endif
 };
 
 std::ostream &operator<< (std::ostream &os, const Chrono &chrono);

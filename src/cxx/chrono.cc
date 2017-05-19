@@ -35,14 +35,21 @@ Chrono::Chrono() {
 }
 
 void Chrono::clear() {
-  memset(m_times, 0, sizeof (struct timespec) * 2);
+#if defined(__MACH__)
+  mach_timebase_info(&m_info);
+#endif
+  memset(m_times, 0, sizeof (m_times));
 }
 
 uint32_t Chrono::getMiliSecs() const {
+#if defined(__MACH__)
+    return (m_times[1] - m_times[0]) / 1000000;
+#else
   struct timespec ts;
   getTimespec(ts);
 
   return ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
+#endif
 }
 
 Chrono::operator std::string() const {
@@ -56,6 +63,10 @@ Chrono::operator std::string() const {
 }
 
 Chrono &Chrono::operator += (const Chrono &c) {
+#if defined(__MACH__)
+  m_times[1] += c.m_times[1] - c.m_times[0];
+  return *this;
+#else
   getTimespec(m_times[0]); // getTimespec must work on itself
   c.getTimespec(m_times[1]);
 
@@ -65,6 +76,7 @@ Chrono &Chrono::operator += (const Chrono &c) {
 
   memset(m_times, 0, sizeof(struct timespec));
   return *this;
+#endif
 }
 
 std::ostream &operator << (std::ostream &os, const Chrono &chrono) {
@@ -72,6 +84,11 @@ std::ostream &operator << (std::ostream &os, const Chrono &chrono) {
 }
 
 void Chrono::getTimespec(struct timespec &out) const {
+#if defined(__MACH__)
+  uint64_t delta = (m_times[1] - m_times[0]) * m_info.numer / m_info.denom;
+  out.tv_sec = delta / 1000000000;
+  out.tv_nsec = delta % 1000000000;
+#else
   if (m_times[1].tv_nsec < m_times[0].tv_nsec) {
     out.tv_sec = m_times[1].tv_sec - m_times[0].tv_sec - 1;
     out.tv_nsec = 1000000000 + m_times[1].tv_nsec - m_times[0].tv_nsec;
@@ -80,4 +97,5 @@ void Chrono::getTimespec(struct timespec &out) const {
     out.tv_sec = m_times[1].tv_sec - m_times[0].tv_sec;
     out.tv_nsec = m_times[1].tv_nsec - m_times[0].tv_nsec;
   }
+#endif
 }

@@ -69,9 +69,11 @@ public:
   operator int() const;
   operator unsigned int() const;
 
+  bool operator == (const PyValue &) const;
+  inline bool operator != (const PyValue &v) const { return !(*this == v); }
+
   bool operator == (const char *str) const;
   bool operator == (const std::string &str) const;
-  bool operator == (const PyValue &) const;
   bool operator == (PyObject *) const;
 
   template <typename T>

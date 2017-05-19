@@ -2,8 +2,10 @@
 #link_directories(${CMAKE_CURRENT_BINARY_DIR}/..)
 include_directories(.. ../sem)
 
+if(NOT APPLE)
 add_executable(rwLock_bench rwLock_bench.cc)
 target_link_libraries(rwLock_bench testHelper cxx-misc-tools)
+endif(NOT APPLE)
 
 add_executable(fileLock_bench fileLock_bench.cc)
 target_link_libraries(fileLock_bench testHelper cxx-misc-tools)

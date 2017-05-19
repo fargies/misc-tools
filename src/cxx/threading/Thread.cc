@@ -58,12 +58,14 @@ void *Thread::thread_routine_wrapper(void *data)
 
     thread->thread_routine();
 
-    TCOND_LOCKER(thread->m_thread_cond);
-    if (thread->m_thread_state == DETACHED)
-        thread->m_thread_state = STOPPED;
-    else
-        thread->m_thread_state = ZOMBI;
-    TCOND_BROADCAST(thread->m_thread_cond);
+    {
+        TCOND_LOCKER(thread->m_thread_cond);
+        if (thread->m_thread_state == DETACHED)
+            thread->m_thread_state = STOPPED;
+        else
+            thread->m_thread_state = ZOMBI;
+        TCOND_BROADCAST(thread->m_thread_cond);
+    }
 
     pthread_exit(0);
 }

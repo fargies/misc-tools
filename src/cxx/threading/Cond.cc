@@ -36,6 +36,10 @@
 #include <assert.h>
 #include <string.h>
 
+#if defined(__MACH__)
+#include <sys/time.h>
+#endif
+
 #define CHECK_EQ0(cmd) { \
     int rc = (cmd); \
     if (rc != 0) { \
@@ -68,7 +72,14 @@ int Cond::timedWait(int timeout)
 {
     timespec t;
 
+#if defined(__MACH__)
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    t.tv_sec = tv.tv_sec;
+    t.tv_nsec = tv.tv_usec * 1000;
+#else
     CHECK_EQ0(clock_gettime(CLOCK_REALTIME, &t));
+#endif
 
     unsigned long nsec = (timeout % 1000) * (1000 * 1000) + t.tv_nsec;
     t.tv_sec += timeout / 1000;
