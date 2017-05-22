@@ -1,6 +1,12 @@
 
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/..)
-include_directories(.. ../sem ${CMAKE_BINARY_DIR})
+link_directories(
+    ${CMAKE_CURRENT_BINARY_DIR}/..
+    ${CPPUNIT_LIBRARY_DIRS})
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sem
+    ${CMAKE_BINARY_DIR}
+    ${CPPUNIT_INCLUDE_DIRS})
 
 include(FindPkgConfig)
 pkg_check_modules(CPPUNIT cppunit)
@@ -35,4 +41,3 @@ if(EXPAT)
 endif(EXPAT)
 
 add_test(test_all ${CMAKE_CURRENT_BINARY_DIR}/test_all)
-

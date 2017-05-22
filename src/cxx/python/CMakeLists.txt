@@ -1,4 +1,5 @@
 
+set(Python_ADDITIONAL_VERSIONS 2.7)
 include(FindPythonLibs)
 
 if(PYTHONLIBS_FOUND)

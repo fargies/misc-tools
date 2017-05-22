@@ -1,6 +1,11 @@
 
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/..)
-include_directories(.. ${PYTHON_INCLUDE_DIR})
+link_directories(
+    ${CPPUNIT_LIBRARY_DIRS}
+    ${CMAKE_CURRENT_BINARY_DIR}/..)
+include_directories(
+    ${CPPUNIT_INCLUDE_DIRS}
+    ..
+    ${PYTHON_INCLUDE_DIR})
 
 set(python_test_SRCS
     PyValue_test.cc
@@ -9,4 +14,3 @@ set(python_test_SRCS
 
 add_library(python++-tests SHARED ${python_test_SRCS})
 target_link_libraries(python++-tests python++ ${CPPUNIT_LIBRARIES})
-

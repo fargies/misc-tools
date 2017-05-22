@@ -124,7 +124,7 @@ spam_tester(PyObject *self, PyObject *args)
   }
 
 printf("iter : %s\n", obj->ob_type->tp_name);
-  while (item = PyIter_Next(iter)) {
+  while ((item = PyIter_Next(iter))) {
     printf("item: %s\n", item->ob_type->tp_name);
     Py_DECREF(item);
   }
@@ -133,7 +133,7 @@ printf("iter : %s\n", obj->ob_type->tp_name);
   PyObject *items = PyDict_Items(obj);
   iter = PyObject_GetIter(items);
 
-  while (item = PyIter_Next(iter)) {
+  while ((item = PyIter_Next(iter))) {
 
     PyObject *item2 = PyTuple_GetItem(item, 1);
     //PyTuple_SetItem(item, 1, PyString_FromString("pwet"));
@@ -168,5 +168,3 @@ inititer(void)
   Py_INCREF(&spam_MyIterType);
   PyModule_AddObject(m, "_MyIter", (PyObject *)&spam_MyIterType);
 }
-
-
