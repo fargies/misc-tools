@@ -33,8 +33,6 @@ add_library(cxx-misc-tools SHARED ${cxx_misc_SRCS})
 target_link_libraries(cxx-misc-tools
     python++ expat++ ${cxx_misc_DEPS})
 
-set_target_properties(cxx-misc-tools PROPERTIES LINK_INTERFACE_LIBRARIES "")
-
 add_subdirectory(bench)
 add_subdirectory(expat)
 add_subdirectory(python)

@@ -1,0 +1,13 @@
+/build/
+*.sw[onp]
+moc_*
+*.so
+*.pyc
+*.pyo
+Makefile
+CMakeFiles
+CMakeCache.txt
+.version
+.git_version
+CMakeLists.txt.user
+.git_error.log

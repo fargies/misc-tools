@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 2.8)
 
 project(misc-tools CXX C)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+include(GitVersion)
+GitVersion(1 0)
+
+include(Policies)
+set_policy(CMP0042 NEW)
+
 include(FindPkgConfig)
 pkg_check_modules(DBUS_CPP "dbus-c++-1 >= 0.6.0-pre1")
 
