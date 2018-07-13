@@ -28,6 +28,7 @@ or implied, of Stanislaw Adaszewski. */
 #define QINPUTEVENTRECORDER_H
 
 #include <QVector>
+#include <QSet>
 #include <QEvent>
 #include <QDateTime>
 #include <QObject>
@@ -95,11 +96,14 @@ signals:
 
 private:
     QEvent *cloneEvent(QEvent*);
+    bool isRecordable(const QEvent *evt) const;
 
 private:
     QObject *m_Obj;
     QVector<EventDelivery> m_Recording;
+    bool m_InReplay;
     int m_ReplayPos;
+    QSet<QEvent *> m_ReplayFilter;
     QTimer *m_Timer;
     QDateTime m_RecordingStartTime;
     float m_ReplaySpeedFactor;

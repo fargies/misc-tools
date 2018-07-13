@@ -90,18 +90,34 @@ QEvent* InputEventRecorder::cloneEvent(QEvent *ev)
         return new QKeyEvent(*static_cast<QKeyEvent*>(ev));
     else if (dynamic_cast<QMouseEvent*>(ev))
         return new QMouseEvent(*static_cast<QMouseEvent*>(ev));
-    else if (dynamic_cast<QTabletEvent*>(ev))
-        return new QTabletEvent(*static_cast<QTabletEvent*>(ev));
-    else if (dynamic_cast<QTouchEvent*>(ev))
-        return new QTouchEvent(*static_cast<QTouchEvent*>(ev));
     else if (dynamic_cast<QWheelEvent*>(ev))
         return new QWheelEvent(*static_cast<QWheelEvent*>(ev));
 
     return 0;
 }
 
+bool InputEventRecorder::isRecordable(const QEvent *evt) const
+{
+    switch (evt->type())
+    {
+    case QEvent::Wheel:
+    case QEvent::MouseButtonPress:
+    case QEvent::MouseButtonRelease:
+    case QEvent::MouseButtonDblClick:
+    case QEvent::MouseMove:
+    case QEvent::KeyPress:
+    case QEvent::KeyRelease:
+    case QEvent::ShortcutOverride:
+    case QEvent::ContextMenu:
+        return true;
+    default:
+        return false;
+    }
+}
+
 InputEventRecorder::InputEventRecorder(QObject *obj):
     m_Obj(obj),
+    m_InReplay(false),
     m_Timer(new QTimer),
     m_uniqueId(0)
 {
@@ -116,6 +132,15 @@ InputEventRecorder::~InputEventRecorder()
 
 bool InputEventRecorder::eventFilter(QObject *obj, QEvent *ev)
 {
+    if (m_InReplay || !m_ReplayFilter.isEmpty())
+    {
+        if (!m_ReplayFilter.remove(ev) && isRecordable(ev))
+            return true; /* filtering external events during replays */
+        else if (m_ReplayFilter.isEmpty() && !m_InReplay)
+            qApp->removeEventFilter(this);
+        return false;
+    }
+
     if ((obj != m_Obj) && !isChild(obj, m_Obj))
         return false;
 
@@ -213,6 +238,8 @@ void InputEventRecorder::replay(float speedFactor)
         return;
     }
 
+    qApp->installEventFilter(this);
+    m_InReplay = true;
     m_ReplayPos = 0;
     m_ReplaySpeedFactor = speedFactor;
     m_Timer->setInterval(0);
@@ -222,6 +249,11 @@ void InputEventRecorder::replay(float speedFactor)
 void InputEventRecorder::replay()
 {
     EventDelivery& rec(m_Recording[m_ReplayPos++]);
+    if (m_ReplayPos >= m_Recording.size())
+    {
+        /* must do this before posting last */
+        m_InReplay = false;
+    }
 
     QStringList path = rec.objName().split("/", QString::KeepEmptyParts);
     if (path.size() > 0)
@@ -234,7 +266,9 @@ void InputEventRecorder::replay()
         {
             if (obj->metaObject()->className() == rec.clsName() && objectPath(obj) == rec.objName())
             {
-                qApp->postEvent(obj, cloneEvent(rec.event()));
+                QEvent *posted = cloneEvent(rec.event());
+                m_ReplayFilter.insert(posted);
+                qApp->postEvent(obj, posted);
                 break;
             }
         }
@@ -247,6 +281,6 @@ void InputEventRecorder::replay()
     }
 
     int delta = m_Recording[m_ReplayPos].timeOffset() - m_Recording[m_ReplayPos - 1].timeOffset();
-    m_Timer->setInterval(delta > 0 ? delta * m_ReplaySpeedFactor : 0);
+    m_Timer->setInterval(delta > 0 ? (delta * m_ReplaySpeedFactor) : 0);
     m_Timer->start();
 }

@@ -74,7 +74,10 @@ TestRecorder::~TestRecorder()
 void TestRecorder::run(const QString &msg, float speed)
 {
     if (m_recorder->obj())
+    {
         QMetaObject::invokeMethod(m_recorder->obj(), "show");
+        QMetaObject::invokeMethod(m_recorder->obj(), "setFocus");
+    }
 
     if ((s_forced || !QFile::exists(getDataFileName())) && askForUpdate(msg))
     {
