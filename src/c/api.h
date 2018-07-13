@@ -27,8 +27,22 @@
 #ifndef __API_H__
 #define __API_H__
 
-#define __GNUC_REQ(maj, min) \
-    defined(__GNUC__) && ((__GNUC__ == maj && __GNUC_MINOR__ >= min) || __GNUC__ > maj)
+#if defined(__cplusplus)
+#define BEGIN_DECLS extern "C" {
+#define END_DECLS }
+#define EXTERN_C extern "C"
+#else
+#define BEGIN_DECLS
+#define END_DECLS
+#define EXTERN_C
+#endif
+
+#undef __GNUC_REQ
+#if defined(__GNUC__)
+#define __GNUC_REQ(maj, min) ((__GNUC__ == maj && __GNUC_MINOR__ >= min) || __GNUC__ > maj)
+#else
+#define __GNUC_REQ(maj, min) 0
+#endif
 
 #if __GNUC_REQ(3, 3)
 #define HIDDEN __attribute__ ((visibility("hidden")))
@@ -59,4 +73,3 @@
 #endif
 
 #endif
-

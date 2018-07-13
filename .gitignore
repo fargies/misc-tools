@@ -1,9 +1,14 @@
-/build/
+# Build related
+/build*
+/.clang_complete
+/coverage/
+
 *.sw[onp]
 moc_*
 *.so
 *.pyc
 *.pyo
+*.pch
 Makefile
 CMakeFiles
 CMakeCache.txt

@@ -89,7 +89,7 @@ public:
 
   void data()
   {
-      char buffer[] = { 'a', 'b', 'c', '0', '1',
+      unsigned char buffer[] = { 'a', 'b', 'c', '0', '1',
           '2', '3', '4', '5', '6', 42, 12, 29, 16,
           'Z', 4, 125, 12, 'L', '[', 230
       };
@@ -101,4 +101,3 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestDbg);
-

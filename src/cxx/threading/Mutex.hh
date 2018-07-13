@@ -40,7 +40,7 @@ namespace threading {
 class Mutex
 {
 public:
-    Mutex(int type = DEFAULT_MUTEX_TYPE);
+    explicit Mutex(int type = DEFAULT_MUTEX_TYPE);
     ~Mutex();
 
     void lock();

@@ -1,4 +1,6 @@
 
+if(TESTS)
+
 link_directories(
     ${CMAKE_CURRENT_BINARY_DIR}/..
     ${CPPUNIT_LIBRARY_DIRS})
@@ -7,9 +9,6 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../sem
     ${CMAKE_BINARY_DIR}
     ${CPPUNIT_INCLUDE_DIRS})
-
-include(FindPkgConfig)
-pkg_check_modules(CPPUNIT cppunit)
 
 add_library(testHelper SHARED test_main.cc)
 target_link_libraries(testHelper ${CPPUNIT_LIBRARIES})
@@ -34,6 +33,8 @@ target_link_libraries(test_all testHelper cxx-misc-tools)
 
 if(PYTHONLIBS_FOUND)
     target_link_libraries(test_all python++-tests)
+else(PYTHONLIBS_FOUND)
+    message(SEND_ERROR "Python not found")
 endif(PYTHONLIBS_FOUND)
 
 if(EXPAT)
@@ -41,3 +42,5 @@ if(EXPAT)
 endif(EXPAT)
 
 add_test(test_all ${CMAKE_CURRENT_BINARY_DIR}/test_all)
+
+endif(TESTS)

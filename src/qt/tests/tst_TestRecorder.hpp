@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2018 Sylvain Fargier
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,39 +17,31 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** Locker.hh
-**
-**        Created on: Apr 06, 2012
-**   Original Author: fargie_s
+** Created on: 2018-07-13T11:36:05+02:00
+**     Author: Sylvain Fargier <fargie_s> <fargier.sylvain@free.fr>
 **
 */
 
-#ifndef __LOCKER_HH__
-#define __LOCKER_HH__
+#ifndef __TST_TEST_RECORDER_HPP__
+#define __TST_TEST_RECORDER_HPP__
 
-namespace threading {
+#include <QObject>
+#include <QWidget>
 
-class Mutex;
-
-class Locker
+class AutoRecorder : public QObject
 {
+    Q_OBJECT
 public:
-    explicit Locker(Mutex &m);
-    ~Locker();
+    AutoRecorder(QWidget *subject, bool doSave, QObject *parent = nullptr);
 
-    inline Mutex &mutex() const
-    {
-        return m_mutex;
-    }
+public slots:
+    void onAskForUpdate();
+    void onRecording();
+    void onValidate();
 
-private:
-    Locker(const Locker &);
-    Locker &operator =(const Locker &);
-
-    Mutex &m_mutex;
+protected:
+    QWidget *m_subject;
+    bool m_doSave;
 };
 
-}
-
-#endif
-
+#endif  // __TST_TEST_RECORDER_HPP__

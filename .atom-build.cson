@@ -1,0 +1,46 @@
+targets:
+  cmake:
+    cmd: "cmake .. -DCOVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
+    name: "configure"
+    sh: true
+    cwd: "{PROJECT_PATH}/build"
+    atomCommandName: "build: cmake"
+  build:
+    cmd: "make -j4"
+    name: "build"
+    sh: true
+    cwd: "{PROJECT_PATH}/build"
+    errorMatch: [
+      "(?<file>[\\/0-9a-zA-Z\\._-]+):(?<line>\\d+):(?<col>\\d+):\\s+(fatal )?error:\\s+(?<message>.+)"
+      "\\s+\\d+\\. (?<file>[\\/0-9a-zA-Z\\._]+):(?<line>\\d+)\\s+-\\s(?<message>.+)"
+    ]
+    warningMatch: [
+      "(?<file>[\\/0-9a-zA-Z\\._]+):(?<line>\\d+):(?<col>\\d+):\\s+warning:\\s+(?<message>.+)"
+      "\\s+\\d+\\. (?<file>[\\/0-9a-zA-Z\\._]+):(?<line>\\d+)\\s+-\\s(?<message>.+)"
+    ]
+    keymap: "ctrl-b"
+    buildOnSave: true
+    atomCommandName: "build: all"
+  test:
+    cmd: "make cov-clean && make -j4 && make test-verbose && make lcov"
+    name: "test"
+    sh: true
+    cwd: "{PROJECT_PATH}/build"
+    errorMatch: [
+      "(?<file>[\\/0-9a-zA-Z\\._-]+):(?<line>\\d+):(?<col>\\d+):\\s+(fatal )?error:\\s+(?<message>.+)"
+      "\\s+\\d+\\. (?<file>[\\/0-9a-zA-Z\\._]+):(?<line>\\d+)\\s+-\\s(?<message>.+)"
+    ]
+    warningMatch: [
+      "(?<file>[\\/0-9a-zA-Z\\._]+):(?<line>\\d+):(?<col>\\d+):\\s+warning:\\s+(?<message>.+)"
+      "\\s+\\d+\\. (?<file>[\\/0-9a-zA-Z\\._]+):(?<line>\\d+)\\s+-\\s(?<message>.+)"
+    ]
+    atomCommandName: "build: test"
+  lint:
+    cmd: "cd build && make lint" # must run in src for warningMatch
+    name: "lint"
+    sh: true
+    warningMatch: [
+      "(?<file>[\\/0-9a-zA-Z\\._]+):(?<line>\\d+):(?<col>\\d+):\\s+(?<message>.+)"
+    ]
+    buildOnSave: true
+    atomCommandName: "build: lint"

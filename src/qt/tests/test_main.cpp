@@ -17,7 +17,7 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** test_main.cc
+** test_main.cpp
 **
 **        Created on: Thu 29 Apr 2010 11:18:09 AM CEST
 **            Author: Fargier Sylvain <fargier.sylvain@free.fr>
@@ -34,10 +34,14 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
 
+#include <QApplication>
+
 #include <string>
 #include <list>
 #include <iostream>
 
+#include "QtRunner.hpp"
+#include "TestRecorder.hpp"
 #include "config.h"
 
 #ifdef HAVE_GETOPT_LONG
@@ -46,7 +50,7 @@
 
 static std::ostream &printTest(std::ostream &out, const CppUnit::Test *test) {
   out << test->getName() << "\n";
-  for (unsigned int i = 0; i < test->getChildTestCount(); ++i)
+  for (int i = 0; i < test->getChildTestCount(); ++i)
   {
     printTest(out, test->getChildTestAt(i));
   }
@@ -58,18 +62,23 @@ static std::ostream &printTest(std::ostream &out, const CppUnit::Test *test) {
 /* Test program */
 int main(int argc, char** argv)
 {
+  QApplication app(argc, argv);
   CppUnit::TestResult testresult;
   CppUnit::TestResultCollector collectedresults;
   CppUnit::BriefTestProgressListener brieflistener;
   CppUnit::TestRunner testrunner;
+  CppUnit::QtRunner qtrunner(testrunner);
   std::ofstream fb;
-  std::list< std::string > test_list;
+  std::list<std::string> test_list;
+
+  app.setQuitOnLastWindowClosed(false);
 
 #ifdef HAVE_GETOPT_LONG
   int c;
   struct option long_options[] = {
     {"help", 0, 0, 'h'},
     {"list", 0, 0, 'l'},
+    {"record", 0, 0, 'r'},
     {0, 0, 0, 0}
   };
 
@@ -90,6 +99,9 @@ int main(int argc, char** argv)
         delete t;
         exit(EXIT_SUCCESS);
       }
+      case 'r':
+        TestRecorder::setForced(true);
+        break;
     }
   }
 
@@ -104,11 +116,11 @@ int main(int argc, char** argv)
   testresult.addListener(&brieflistener);
   testrunner.addTest(CppUnit::TestFactoryRegistry::getRegistry().makeTest());
   if (test_list.empty())
-    testrunner.run(testresult);
+    qtrunner.run(testresult);
   else {
     std::list<std::string>::const_iterator it;
     for (it = test_list.begin(); it != test_list.end(); ++it) {
-      testrunner.run(testresult, *it);
+      qtrunner.run(testresult, *it);
     }
   }
 

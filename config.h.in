@@ -31,4 +31,10 @@
 
 #cmakedefine HAVE_GETOPT_LONG
 
+#define TOP_SRCDIR "@CMAKE_SOURCE_DIR@"
+
+#define SRC_DATADIR TOP_SRCDIR "/tests/data"
+
+#define BIN_DATADIR "@CMAKE_INSTALL_PREFIX@/tests/@PROJECT_NAME@/data"
+
 #endif /* CONFIG_H_ */

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2014 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,39 +17,42 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** Locker.hh
+** QtRunner.hpp
 **
-**        Created on: Apr 06, 2012
-**   Original Author: fargie_s
+**        Created on: Feb 03, 2013
+**   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
 
-#ifndef __LOCKER_HH__
-#define __LOCKER_HH__
+#ifndef __QT_RUNNER_HH__
+#define __QT_RUNNER_HH__
 
-namespace threading {
+#include <string>
+#include <QObject>
 
-class Mutex;
-
-class Locker
+namespace CppUnit
 {
+class TestRunner;
+class TestResult;
+
+class QtRunner : public QObject
+{
+    Q_OBJECT
+
 public:
-    explicit Locker(Mutex &m);
-    ~Locker();
+    explicit QtRunner(TestRunner &runner);
 
-    inline Mutex &mutex() const
-    {
-        return m_mutex;
-    }
+    void run(TestResult &controller, const std::string &testPath="");
 
-private:
-    Locker(const Locker &);
-    Locker &operator =(const Locker &);
+protected Q_SLOTS:
+    void run();
 
-    Mutex &m_mutex;
+protected:
+    TestRunner &m_runner;
+    TestResult *m_controller;
+    std::string m_path;
 };
 
 }
 
 #endif
-

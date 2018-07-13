@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2014 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,39 +17,43 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** Locker.hh
+** QtRunner.cpp
 **
-**        Created on: Apr 06, 2012
-**   Original Author: fargie_s
+**        Created on: Feb 03, 2013
+**   Original Author: Fargier Sylvain <fargier.sylvain@free.fr>
 **
 */
 
-#ifndef __LOCKER_HH__
-#define __LOCKER_HH__
+#include <QMetaObject>
+#include <QCoreApplication>
+#include <cppunit/TestRunner.h>
+#include <QDebug>
 
-namespace threading {
+#include "QtRunner.hpp"
 
-class Mutex;
+using namespace CppUnit;
 
-class Locker
+QtRunner::QtRunner(TestRunner &runner) :
+    m_runner(runner),
+    m_controller(NULL),
+    m_path()
 {
-public:
-    explicit Locker(Mutex &m);
-    ~Locker();
-
-    inline Mutex &mutex() const
-    {
-        return m_mutex;
-    }
-
-private:
-    Locker(const Locker &);
-    Locker &operator =(const Locker &);
-
-    Mutex &m_mutex;
-};
-
 }
 
-#endif
+void QtRunner::run(TestResult &controller, const std::string &testPath)
+{
+    m_controller = &controller;
+    m_path = testPath;
+
+    QMetaObject::invokeMethod(this, "run", Qt::QueuedConnection);
+
+    QCoreApplication::exec();
+}
+
+void QtRunner::run()
+{
+    m_runner.run(*m_controller, m_path);
+
+    QCoreApplication::exit(0);
+}
 
